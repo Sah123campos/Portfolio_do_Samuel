@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://sah123campos.github.io/Portfolio_do_Samuel/sitemap.xml

@@ -1,327 +1,249 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portfólio - Desenvolvedor Full Stack</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <!-- AOS CSS -->
-    <link href="/WhatsApp Image 2025-08-25 at 18.30.54.jpeg" rel="stylesheet">
-    <!-- Atualização do ícone do site para usar a imagem correta -->
-    <link rel="icon" href="/WhatsApp Image 2025-08-25 at 18.30.54.jpeg" type="image/png">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Samuel Santana — Desenvolvedor Full-Stack</title>
+  <meta name="description" content="Portfólio de Samuel Santana, desenvolvedor full-stack com foco em back-end Java e Spring Boot. Experiências 3D com Three.js e sites para clientes reais.">
+  <meta name="author" content="Samuel Santana">
+  <meta name="theme-color" content="#050a14">
+  <meta name="color-scheme" content="dark">
+  <link rel="canonical" href="https://sah123campos.github.io/Portfolio_do_Samuel/">
+
+  <meta property="og:type" content="website">
+  <meta property="og:locale" content="pt_BR">
+  <meta property="og:title" content="Samuel Santana — Desenvolvedor Full-Stack">
+  <meta property="og:description" content="Sistemas web de ponta a ponta e experiências 3D no navegador.">
+  <meta property="og:url" content="https://sah123campos.github.io/Portfolio_do_Samuel/">
+  <meta property="og:image" content="https://sah123campos.github.io/Portfolio_do_Samuel/assets/images/og.jpg">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="icon" href="assets/images/favicon.svg" type="image/svg+xml">
+  <script>document.documentElement.classList.add("js");</script>
+
+  <link rel="preload" href="assets/fonts/bricolage-grotesque-normal-500-800.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="css/fonts.css">
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Samuel Santana",
+    "jobTitle": "Desenvolvedor Full-Stack",
+    "worksFor": { "@type": "CollegeOrUniversity", "name": "Universidade Federal de São Carlos (UFSCar)" },
+    "alumniOf": { "@type": "EducationalOrganization", "name": "SENAI" },
+    "url": "https://sah123campos.github.io/Portfolio_do_Samuel/",
+    "email": "mailto:samuspcampos@gmail.com",
+    "knowsAbout": ["Java", "Spring Boot", "Spring Security", "JPA", "Hibernate", "Thymeleaf", "Three.js", "WebGL", "GSAP", "JavaScript", "MySQL", "PostgreSQL", "MongoDB", "Docker"],
+    "sameAs": ["https://github.com/Sah123campos", "https://www.linkedin.com/in/samuel-santana-7623402b8/"]
+  }
+  </script>
+
+  <!-- Bibliotecas de animação (as mesmas dos projetos 3D) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js" defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+  <script type="module" src="js/main.js"></script>
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <nav class="nav">
-            <div class="nav-brand" data-aos="fade-right">Portfólio</div>
-            <ul class="nav-menu">
-                <li data-aos="fade-down" data-aos-delay="100"><a href="#home">Início</a></li>
-                <li data-aos="fade-down" data-aos-delay="200"><a href="#about">Sobre</a></li>
-                <li data-aos="fade-down" data-aos-delay="300"><a href="#skills">Habilidades</a></li>
-                <li data-aos="fade-down" data-aos-delay="400"><a href="#projects">Projetos</a></li>
-                <li data-aos="fade-down" data-aos-delay="500"><a href="#contact">Contato</a></li>
-            </ul>
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </nav>
-    </header>
+  <a class="skip-link" href="#conteudo">Pular para o conteúdo</a>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <!-- Background Dragon Canvas -->
-        <div class="hero-background">
-            <svg id="dragon-svg" width="100%" height="100%" viewBox="0 0 900 500">
-                <defs>
-                    <g id="Cabeza" transform="matrix(1, 0, 0, 1, 0, 0)">
-                        <path
-                            style="fill: #ffffff; fill-opacity: 1"
-                            d="M-28.9,-1.1L-28.55 -1.95Q-28.1 -3.1 -27.25 -2.95L-26.7 -2.95Q-27.7 -1.65 -28.9 -1.1M-18.35,-1.8Q-15.1 -10.3 -9.6 -6.05Q-15.1 -6.2 -18.35 -1.8M-18.35,1.1Q-15.1 5.45 -9.6 5.35Q-15.1 9.55 -18.35 1.1M-26.7,2.2L-27.25 2.25Q-28.1 2.4 -28.55 1.2L-28.9 0.35Q-27.7 0.9 -26.7 2.2"
-                        />
-                        <path
-                            style="fill: #000000; fill-opacity: 1"
-                            d="M-21.05,-8.25Q-13.6 -15.95 -1.3 -12.1Q-7.85 -8.5 -5.85 -4.35Q-2.3 -4.85 10.5 0.15Q0 4.35 -5.85 3.65Q-7.85 7.75 -1.25 12.45Q-13.6 15.2 -21.05 7.5Q-29.55 4.05 -30.2 -0.35Q-29.55 -4.8 -21.05 -8.25M-26.7,-2.95L-27.25 -2.95Q-28.1 -3.1 -28.55 -1.95L-28.9 -1.1Q-27.7 -1.65 -26.7 -2.95M-9.6,-6.05Q-15.1 -10.3 -18.35 -1.8Q-15.1 -6.2 -9.6 -6.05M-9.6,5.35Q-15.1 5.45 -18.35 1.1Q-15.1 9.55 -9.6 5.35M-28.9,0.35L-28.55 1.2Q-28.1 2.4 -27.25 2.25L-26.7 2.2Q-27.7 0.9 -28.9 0.35"
-                        />
-                    </g>
-                    <g id="Aletas" transform="matrix(1, 0, 0, 1, 0, 0)">
-                        <linearGradient
-                            id="LinearGradID_1"
-                            gradientUnits="userSpaceOnUse"
-                            gradientTransform="matrix(0.0935974, 0, 0, 0.188782, -20.55, 0)"
-                            spreadMethod="pad"
-                            x1="-819.2"
-                            y1="0"
-                            x2="819.2"
-                            y2="0"
-                        >
-                            <stop offset="0" style="stop-color: #cccccc; stop-opacity: 1" />
-                            <stop offset="1" style="stop-color: #000000; stop-opacity: 1" />
-                        </linearGradient>
-                        <path
-                            style="fill: url(#LinearGradID_1)"
-                            d="M29.75,-36.85Q-17.75 -61.45 -42.05 -40.95L-45.35 -38.35L-53.7 -41.15L-51.15 -44.85Q-34.85 -68.4 21 -57.8Q-32.2 -72.1 -50.25 -50Q-53.85 -45.65 -56.05 -41.95L-64.7 -43.35L-60.6 -50.3Q-45.9 -75.55 5.1 -79.35Q-2.2 -79.8 -9.45 -79.15Q-16.2 -78.55 -22.85 -77.15Q-29.85 -75.65 -36.5 -73Q-43.05 -70.4 -48.8 -66.85Q-54.55 -63.35 -56.8 -60.3L-60.5 -55.4Q-62.95 -52.1 -67 -43.55L-70.55 -43.55L-76.35 -42.95Q-74.6 -49.1 -71.85 -54.85Q-68.9 -61.25 -64.8 -67.1Q-60.8 -73 -55.45 -77.55Q-49.9 -82.35 -43.65 -85.85L-30.6 -92.7Q-24.05 -95.95 -17 -98.25Q-63.75 -86.35 -73.65 -57.1Q-75.75 -50.75 -77.45 -42.75Q-82.9 -41.75 -88 -39.65Q-87.65 -46.65 -86.3 -53.05Q-79.8 -89.8 -36.65 -117.2Q-80.65 -94.5 -87.55 -59.55Q-88.65 -54.15 -88.95 -39.4L-89.8 -38.85L-92.7 -37.6Q-93.75 -44.35 -94.1 -51.15Q-94.4 -58.2 -93.25 -65.1Q-92.15 -72.5 -90.05 -79.65Q-88.05 -86.55 -85 -93Q-82.1 -99.3 -78.45 -105.15Q-74.6 -111.35 -70.25 -117.25Q-65.95 -123.1 -61.1 -128.55Q-70.3 -119.35 -77.9 -108.7Q-86 -97.3 -90.8 -84.05Q-95.8 -70.5 -96 -56.15Q-96.1 -46 -94.05 -36.05L-93.25 -31.55Q-93.5 -35.65 -92.35 -36Q-79.85 -42 -66.6 -40.45Q-52.45 -38.85 -39.2 -33.25Q-28.3 -29.9 -21.25 -24.15Q-17.8 -23.3 -8.6 -15.6Q-12.1 -20.75 -16.75 -24.5Q-24.55 -30.7 -34.25 -34.05L-42.55 -37Q-38.9 -41.25 -31.5 -43.25Q-24.05 -45.3 -16.2 -46.3Q-8.35 -47.35 -1 -46Q5.95 -44.75 12.75 -42.85Q19.85 -40.9 29.75 -36.85M-92.45,-27.35L-94.95 -36.25Q-109.7 -105 -27.95 -154.65Q-98.65 -103.8 -91.75 -39.4L-89.95 -40.2Q-92.2 -105.25 -5.6 -130.9Q-78.8 -99.95 -87.45 -40.9Q-83.15 -42.95 -78.45 -43.95Q-70 -101.3 17.65 -103.8Q-56.9 -93.4 -74.5 -44.55L-67.4 -45.45Q-49.1 -94.95 39.25 -75.65Q-36.75 -84.35 -62.25 -44.25L-57.3 -43.6Q-31.65 -86.5 56.15 -46.05Q-20.3 -73.35 -51.35 -41.7L-45.95 -39.75Q-17.85 -71.35 51.85 -24.8Q-8.7 -56.4 -39.75 -37.05Q-28.15 -34.05 -14.25 -24.45Q-8.6 -19.85 -5.8 -16.95Q5.95 -2.4 20 0Q5.95 2.4 -5.8 16.95Q-8.6 19.85 -14.25 24.45Q-28.15 34.05 -39.75 37.05Q-8.7 56.4 51.85 24.8Q-17.85 71.35 -45.95 39.75L-51.35 41.7Q-20.3 73.35 56.15 46.1Q-31.65 86.5 -57.3 43.65L-62.25 44.3Q-36.75 84.35 39.25 75.7Q-49.1 94.95 -67.4 45.5L-74.5 44.6Q-56.9 93.4 17.65 103.85Q-70 101.3 -78.45 43.95Q-83.15 42.95 -87.45 40.9Q-78.8 99.95 -5.6 130.9Q-92.2 105.25 -89.95 40.25L-91.75 39.4Q-98.65 103.8 -27.95 154.65Q-109.7 105 -94.95 36.3L-92.45 27.35Q-93.05 33.9 -92.05 34.75Q-91.1 35.55 -88.95 36.7L-87.95 37Q-83.7 38.25 -79.05 38.8L-77.25 38.95Q-72.55 39.3 -67.5 38.85L-65.45 38.65Q-44.4 36.05 -17.8 19.6Q-9.9 12.8 -15.15 4.4Q-18.15 3.15 -19 0Q-18.15 -3.15 -15.15 -4.4Q-9.9 -12.8 -17.8 -19.6L-17.8 -19.55Q-44.4 -36.05 -65.45 -38.6L-67.5 -38.8Q-72.55 -39.3 -77.25 -38.95L-79.05 -38.75Q-83.7 -38.25 -87.95 -36.95L-88.95 -36.65Q-91.1 -35.55 -92.05 -34.7Q-93.05 -33.9 -92.45 -27.35M-8.6,15.6Q-17.8 23.3 -21.25 24.2Q-28.3 29.9 -39.2 33.3Q-52.45 38.85 -66.6 40.5Q-79.85 42 -92.35 36Q-93.5 35.65 -93.25 31.55L-94.05 36.1Q-96.1 46.05 -96 56.15Q-95.8 70.5 -90.8 84.1Q-86 97.3 -77.9 108.75Q-70.3 119.35 -61.1 128.6Q-65.95 123.1 -70.25 117.25Q-74.6 111.35 -78.45 105.15Q-82.1 99.3 -85 93Q-88.05 86.55 -90.05 79.7Q-92.15 72.5 -93.25 65.1Q-94.4 58.2 -94.1 51.2Q-93.75 44.35 -92.7 37.6L-89.8 38.9L-88.95 39.45Q-88.65 54.15 -87.55 59.55Q-80.65 94.5 -36.65 117.25Q-79.8 89.8 -86.3 53.1Q-87.65 46.65 -88 39.65Q-82.9 41.75 -77.45 42.75Q-75.75 50.75 -73.65 57.15Q-63.75 86.35 -17 98.3Q-24.05 95.95 -30.6 92.75L-43.65 85.9Q-49.9 82.35 -55.45 77.6Q-60.8 73 -64.8 67.15Q-68.9 61.25 -71.85 54.85Q-74.6 49.1 -76.35 42.95L-70.55 43.6L-67 43.6Q-62.95 52.1 -60.5 55.4L-56.8 60.35Q-54.55 63.35 -48.8 66.9Q-43.05 70.4 -36.5 73Q-29.85 75.65 -22.85 77.15Q-16.2 78.55 -9.45 79.15Q-2.2 79.8 5.1 79.35Q-45.9 75.55 -60.6 50.3L-64.7 43.4L-56.05 41.95Q-53.85 45.65 -50.25 50Q-32.2 72.1 21 57.85Q-34.85 68.4 -51.15 44.85L-53.7 41.2L-45.35 38.35L-42.05 40.95Q-17.75 61.45 29.75 36.85Q19.85 40.9 12.75 42.9Q5.95 44.75 -1 46Q-8.35 47.35 -16.2 46.35Q-24.05 45.3 -31.5 43.3Q-38.9 41.25 -42.55 37.05L-34.25 34.05Q-24.55 30.7 -16.75 24.5Q-12.1 20.75 -8.6 15.6"
-                        />
-                    </g>
-                    <g id="Espina" transform="matrix(1, 0, 0, 1, 0, 0)">
-                        <linearGradient
-                            id="LinearGradID_2"
-                            gradientUnits="userSpaceOnUse"
-                            gradientTransform="matrix(0.0229492, 0, 0, -0.0152893, 0, 0.05)"
-                            spreadMethod="pad"
-                            x1="-819.2"
-                            y1="0"
-                            x2="819.2"
-                            y2="0"
-                        >
-                            <stop offset="0" style="stop-color: #cccccc; stop-opacity: 1" />
-                            <stop offset="1" style="stop-color: #333333; stop-opacity: 1" />
-                        </linearGradient>
-                        <path
-                            style="fill: url(#LinearGradID_2)"
-                            d="M-18.8,0Q-17.85 -5.7 -12.3 -9.6Q-11.2 -5.35 -6.5 -8.25L-6.45 -8.2L-6.2 -8.3Q1.25 -16.25 6.65 -12.4Q0.05 -12.55 0 -5.95Q2.7 -2.4 7.75 -4.1Q18 -1.45 18.8 0L-18.8 0"
-                        />
-                        <linearGradient
-                            id="LinearGradID_3"
-                            gradientUnits="userSpaceOnUse"
-                            gradientTransform="matrix(0.0229492, 0, 0, 0.0152893, 0, -0.05)"
-                            spreadMethod="pad"
-                            x1="-819.2"
-                            y1="0"
-                            x2="819.2"
-                            y2="0"
-                        >
-                            <stop offset="0" style="stop-color: #cccccc; stop-opacity: 1" />
-                            <stop offset="1" style="stop-color: #333333; stop-opacity:1" />
-                        </linearGradient>
-                        <path
-                            style="fill: url(#LinearGradID_3)"
-                            d="M18.8,0Q18 1.45 7.75 4.1Q2.7 2.4 0 5.95Q0.05 12.55 6.65 12.4Q1.25 16.25 -6.2 8.35Q-6.35 8.25 -6.45 8.25L-6.5 8.25Q-11.2 5.35 -12.3 9.6Q-17.85 5.7 -18.8 0L18.8 0"
-                        />
-                    </g>
-                </defs>
-                <g id="screen" />
-            </svg>
+  <!-- Cena 3D: decorativa, todo o conteúdo também existe em HTML -->
+  <canvas class="scene" aria-hidden="true"></canvas>
+  <div class="scene-veil" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="brand" href="#topo" aria-label="Samuel Santana, voltar ao início">
+        <svg class="brand__mark" viewBox="0 0 32 32" aria-hidden="true"><path d="M6 4h4v24H6zM22 4h4v24h-4z" fill="currentColor"/><path d="M14 10h4v12h-4z" fill="var(--spring)"/></svg>
+        <span>Samuel Santana</span>
+      </a>
+      <nav class="site-nav" aria-label="Principal">
+        <ul class="site-nav__list" role="list">
+          <li><a href="#projetos">Projetos</a></li>
+          <li><a href="#stack">Stack</a></li>
+          <li><a href="#trajetoria">Trajetória</a></li>
+        </ul>
+      </nav>
+      <a class="button button--glow button--small" href="#contato">Falar comigo</a>
+    </div>
+  </header>
+
+  <!-- Paradas da câmera: navegação lateral -->
+  <nav class="rail" aria-label="Paradas da página">
+    <ol class="rail__list" role="list" data-rail></ol>
+  </nav>
+
+  <main id="conteudo">
+    <!-- HERO -->
+    <section id="topo" class="hero" aria-labelledby="hero-title" data-stop="Início">
+      <div class="hero__inner">
+        <p class="hero__kicker" data-reveal-load>Desenvolvedor full-stack, UFSCar</p>
+        <h1 id="hero-title" class="hero__name">
+          <span class="hero__mask"><span class="hero__line" data-reveal-load>Samuel</span></span>
+          <span class="hero__mask"><span class="hero__line" data-reveal-load>Santana</span></span>
+        </h1>
+        <p class="hero__lede" data-reveal-load>
+          Construo sistemas web de ponta a ponta, com foco em back-end Java e Spring Boot. No tempo livre, faço o navegador renderizar planetas, fábricas e carros em 3D.
+        </p>
+        <div class="hero__actions" data-reveal-load>
+          <a class="button button--glow" href="#projetos">Ver projetos</a>
+          <a class="button button--line" href="https://github.com/Sah123campos" target="_blank" rel="noopener">GitHub<span class="visually-hidden"> (abre em nova aba)</span></a>
         </div>
-        
-        <div class="hero-content">
-            <div class="hero-text" data-aos="fade-up-right">
-                <h1>Olá, eu sou um <span class="highlight">Desenvolvedor Full Stack</span></h1>
-                <p>Formado em Análise e Desenvolvimento de Sistemas no SENAI</p>
-                <div class="hero-buttons">
-                    <a href="#contact" class="btn btn-primary" style="border: 2px solid #FFFFFF; background-color: #FFC107; color: #FFFFFF;">Entre em Contato</a>
-                    <a href="#skills" class="btn btn-secondary" style="background-color: #007BFF; color: #FFFFFF;">Ver Habilidades</a>
-                </div>
-            </div>
-            <div class="hero-image" data-aos="fade-up-left">
-                <div class="profile-photo">
-                    <img src="WhatsApp Image 2025-08-25 at 18.30.54.jpeg" alt="Minha Foto de Perfil" class="profile-img">
-                </div>
-            </div>
-        </div>
+      </div>
+
+      <dl class="hero__facts" data-reveal-load>
+        <div><dt>Hoje</dt><dd>Desenvolvedor na DeOTIC, UFSCar</dd></div>
+        <div><dt>Foco</dt><dd>Java, Spring Boot e JPA</dd></div>
+        <div><dt>Formação</dt><dd>Técnico em ADS pelo SENAI, cursando ADS</dd></div>
+      </dl>
+
+      <p class="scroll-hint" aria-hidden="true"><span class="scroll-hint__line"></span>Role para entrar na órbita</p>
     </section>
 
-    
+    <!-- PROJETOS EM ÓRBITA -->
+    <section id="projetos" class="projects" aria-labelledby="projetos-title">
+      <header class="projects__intro">
+        <h2 id="projetos-title" class="section-title">Projetos em órbita</h2>
+        <p>Cada tela é um projeto publicado no GitHub.<span class="only-3d"> Role para a câmera visitar uma por vez.</span></p>
+      </header>
 
-    <!-- About Section -->
-    <section id="about" class="about">
-        <div class="container">
-            <h2 data-aos="fade-up">Sobre Mim</h2>
-            <div class="about-content" data-aos="fade-up-right">
-                <div class="about-text">
-                    <p>Sou um programador apaixonado por tecnologia. Formado em Análise e Desenvolvimento de Sistemas no SENAI, onde tenho desenvolvido uma base sólida em programação e arquitetura de sistemas.</p>
-                    <p>Como desenvolvedor full stack, tenho experiência em trabalhar tanto no frontend quanto no backend, criando aplicações web completas e funcionais.</p>
-                    <div class="education" data-aos="fade-up" data-aos-delay="200">
-                        <h3>Formação Acadêmica</h3>
-                        <div class="education-item">
-                            <i class="fas fa-graduation-cap"></i>
-                            <div>
-                                <h4>Técnico em Desenvolvimento de Sistemas</h4>
-                                <p>SENAI - 4º Semestre</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+      <div class="orbit" data-orbit>
+        <div class="orbit__stage">
+          <ol class="orbit__list" role="list" data-projects>
+            <!-- Renderizado por js/main.js a partir de js/projects.js -->
+          </ol>
+
+          <div class="hud" aria-hidden="true">
+            <p class="hud__count"><span data-hud-index>1</span><span class="hud__sep">/</span><span data-hud-total>7</span></p>
+            <p class="hud__angle">θ <span data-hud-angle>0,0</span>°</p>
+            <div class="hud__bar"><span data-hud-bar></span></div>
+          </div>
         </div>
+      </div>
+
+      <noscript>
+        <ul class="projects-fallback">
+          <li><a href="https://sah123campos.github.io/sistema-solar/">O Sistema Solar — experiência 3D</a></li>
+          <li><a href="https://sah123campos.github.io/Loja-de-gamers/">Núcleo Meridiano — jornada 3D</a></li>
+          <li><a href="https://github.com/Sah123campos/AuraMotors">Aura Motors — projeto conceito</a></li>
+          <li><a href="https://habileads.com.br/">Habileads — site para imobiliária</a></li>
+          <li><a href="https://sah123campos.github.io/teste1/">Construtora Peixe — site institucional</a></li>
+          <li><a href="https://sah123campos.github.io/engrenagem_3/">Hélio Soluções Engenharia</a></li>
+          <li><a href="https://sah123campos.github.io/cramer/">Calculadora do método de Cramer</a></li>
+        </ul>
+      </noscript>
+
+      <div class="wip panel">
+        <h3 class="wip__title">Em andamento</h3>
+        <ul class="wip__list" role="list" data-in-progress></ul>
+      </div>
     </section>
 
-    <!-- Skills Section -->
-    <section id="skills" class="skills">
-        <div class="container">
-            <h2 data-aos="fade-up">Minhas Habilidades</h2>
-            <div class="skills-grid">
-                <div class="skill-card" data-aos="fade-up-right" data-aos-delay="100">
-                    <div class="skill-icon">
-                        <i class="fab fa-html5"></i>
-                    </div>
-                    <h3>HTML5</h3>
-                    <p>Desenvolvimento de estruturas semânticas e acessíveis para web</p>
-                </div>
-                <div class="skill-card" data-aos="fade-up-right" data-aos-delay="200">
-                    <div class="skill-icon">
-                        <i class="fab fa-css3-alt"></i>
-                    </div>
-                    <h3>CSS3</h3>
-                    <p>Estilização responsiva e design moderno para interfaces</p>
-                </div>
-                <div class="skill-card" data-aos="fade-up-right" data-aos-delay="300">
-                    <div class="skill-icon">
-                        <i class="fab fa-js-square"></i>
-                    </div>
-                    <h3>JavaScript</h3>
-                    <p>Programação frontend e lógica de aplicações web</p>
-                </div>
-                <div class="skill-card" data-aos="fade-up-right" data-aos-delay="400">
-                    <div class="skill-icon">
-                        <i class="fab fa-python"></i>
-                    </div>
-                    <h3>Python</h3>
-                    <p>Desenvolvimento backend e automação de processos</p>
-                </div>
-                <div class="skill-card" data-aos="fade-up-right" data-aos-delay="500">
-                    <div class="skill-icon">
-                        <i class="fas fa-database"></i>
-                    </div>
-                    <h3>MySQL</h3>
-                    <p>Gerenciamento e consultas em bancos de dados relacionais</p>
-                </div>
-                <div class="skill-card" data-aos="fade-up-right" data-aos-delay="600">
-                    <div class="skill-icon">
-                        <i class="fab fa-java"></i>
-                    </div>
-                    <h3>Java</h3>
-                    <p>Desenvolvimento de aplicações desktop e web</p>
-                </div>
-            </div>
+    <!-- STACK -->
+    <section id="stack" class="section" aria-labelledby="stack-title" data-stop="Stack">
+      <div class="panel">
+        <header class="section-head">
+          <h2 id="stack-title" class="section-title" data-reveal>Stack</h2>
+          <p data-reveal>O que uso no dia a dia, agrupado pela camada do sistema em que cada coisa trabalha.</p>
+        </header>
+        <div class="stack">
+          <div class="stack__group stack__group--primary" data-reveal>
+            <h3>Back-end</h3>
+            <ul role="list"><li>Java</li><li>Spring Boot</li><li>Spring Security</li><li>JPA e Hibernate</li></ul>
+          </div>
+          <div class="stack__group" data-reveal>
+            <h3>Front-end</h3>
+            <ul role="list"><li>HTML, CSS e JavaScript</li><li>Thymeleaf</li><li>Tailwind CSS</li></ul>
+          </div>
+          <div class="stack__group" data-reveal>
+            <h3>3D e animação</h3>
+            <ul role="list"><li>Three.js e WebGL</li><li>Shaders GLSL</li><li>GSAP e ScrollTrigger</li><li>Lenis</li></ul>
+          </div>
+          <div class="stack__group" data-reveal>
+            <h3>Dados</h3>
+            <ul role="list"><li>MySQL</li><li>PostgreSQL</li><li>MongoDB</li></ul>
+          </div>
+          <div class="stack__group" data-reveal>
+            <h3>Ferramentas</h3>
+            <ul role="list"><li>Git e GitHub</li><li>Docker</li><li>Postman</li><li>IntelliJ IDEA e VS Code</li></ul>
+          </div>
         </div>
+        <p class="stack__next" data-reveal><strong>Estudando agora:</strong> Spring Security avançado, microsserviços com Spring Cloud e AWS.</p>
+      </div>
     </section>
 
-    <!-- Projects Section -->
-    <section id="projects" class="projects">
-        <div class="container">
-            <h2 data-aos="fade-up">Meus Projetos</h2>
-            <div class="projects-grid">
-                <div class="project-card" data-aos="fade-up-right" data-aos-delay="100">
-                    <div class="project-image">
-                        <img src="logohabileads.png" alt="Habileads" style="max-width: 150px; height: auto;" onerror="this.src='https://via.placeholder.com/400x250/ff5733/ffffff?text=Habileads'">
-                    </div>
-                    <div class="project-content">
-                        <h3>Habileads</h3>
-                        <p>Site profissional desenvolvido para a Habileads, uma empresa especializada em geração de leads e marketing digital. O site apresenta os serviços, cases de sucesso e informações sobre a empresa.</p>
-                        <div class="project-tech">
-                            <span class="tech-tag">HTML</span>
-                            <span class="tech-tag">CSS</span>
-                            <span class="tech-tag">JavaScript</span>
-                            <span class="tech-tag">Responsivo</span>
-                        </div>
-                        <div class="project-links">
-                            <a href="https://habileads.com.br/" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Ver Projeto</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="project-card" data-aos="fade-up-right" data-aos-delay="200">
-                    <div class="project-image">
-                        <div class="project-logo">
-                            <i class="fas fa-building"></i>
-                        </div>
-                        <img src="logoconstrutorapeixe.png" alt="Construtora Peixe" onerror="this.src='https://via.placeholder.com/400x250/764ba2/ffffff?text=Construtora+Peixe'">
-                    </div>
-                    <div class="project-content">
-                        <h3>Construtora Peixe</h3>
-                        <p>Site institucional completo para uma construtora com mais de 10 anos de experiência. Inclui apresentação da empresa, portfólio de projetos, serviços oferecidos e formulário de contato.</p>
-                        <div class="project-tech">
-                            <span class="tech-tag">HTML5</span>
-                            <span class="tech-tag">CSS3</span>
-                            <span class="tech-tag">JavaScript</span>
-                            <span class="tech-tag">Responsivo</span>
-                        </div>
-                        <div class="project-links">
-                            <a href="https://sah123campos.github.io/teste1/" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Ver Projeto</a>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="project-card" data-aos="fade-up-right" data-aos-delay="300">
-                    <div class="project-image">
-                        <div class="project-logo">
-                            <i class="fas fa-cogs"></i>
-                        </div>
-                        <img src="logo_Helio_Solucoes.png" alt="Hélio Soluções Engenharia" onerror="this.src='https://via.placeholder.com/400x250/25d366/ffffff?text=Hélio+Soluções'">
-                    </div>
-                    <div class="project-content">
-                        <h3>Hélio Soluções Engenharia</h3>
-                        <p>Site profissional para empresa de engenharia especializada em laudos técnicos, perícias e responsabilidade técnica. Foco em segurança e conformidade com normas regulamentadoras.</p>
-                        <div class="project-tech">
-                            <span class="tech-tag">HTML5</span>
-                            <span class="tech-tag">CSS3</span>
-                            <span class="tech-tag">JavaScript</span>
-                            <span class="tech-tag">UX/UI</span>
-                        </div>
-                        <div class="project-links">
-                            <a href="https://sah123campos.github.io/engrenagem_3/" target="_blank" rel="noopener noreferrer" class="btn btn-primary">Ver Projeto</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+    <!-- TRAJETÓRIA -->
+    <section id="trajetoria" class="section" aria-labelledby="trajetoria-title" data-stop="Trajetória">
+      <div class="panel">
+        <header class="section-head">
+          <h2 id="trajetoria-title" class="section-title" data-reveal>Trajetória</h2>
+          <p data-reveal>Comecei fazendo sites para pequenas empresas, passei pelo 3D no navegador e agora estou descendo a pilha até o back-end.</p>
+        </header>
+        <ol class="timeline" role="list">
+          <li class="timeline__item" data-reveal>
+            <p class="timeline__when">SENAI</p>
+            <div><h3>Técnico em Análise e Desenvolvimento de Sistemas</h3><p>Base em lógica, orientação a objetos, banco de dados e arquitetura de sistemas.</p></div>
+          </li>
+          <li class="timeline__item" data-reveal>
+            <p class="timeline__when">2025</p>
+            <div><h3>Sites para clientes</h3><p>Imobiliária, construtora e empresa de engenharia, do layout à publicação.</p></div>
+          </li>
+          <li class="timeline__item" data-reveal>
+            <p class="timeline__when">2026</p>
+            <div><h3>Experiências 3D</h3><p>Sistema Solar, Núcleo Meridiano e Aura Motors, com Three.js, shaders e animação guiada pela rolagem.</p></div>
+          </li>
+          <li class="timeline__item" data-reveal>
+            <p class="timeline__when">2026</p>
+            <div><h3>Desenvolvedor na UFSCar</h3><p>Servidor na Secretaria Geral de Informática, atuando na DeOTIC.</p></div>
+          </li>
+          <li class="timeline__item timeline__item--now" data-reveal>
+            <p class="timeline__when">Agora</p>
+            <div><h3>Graduação em ADS e back-end Java</h3><p>Cursando Análise e Desenvolvimento de Sistemas e construindo projetos com Spring Boot.</p></div>
+          </li>
+        </ol>
+      </div>
     </section>
 
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
-        <div class="container">
-            <h2 data-aos="fade-up">Entre em Contato</h2>
-            <div class="contact-content">
-                <div class="contact-info" data-aos="fade-up-right">
-                    <h3>Vamos trabalhar juntos!</h3>
-                    <p>Estou sempre aberto a novas oportunidades e projetos interessantes. Entre em contato comigo através dos canais abaixo:</p>
-                    <div class="contact-items">
-                        <div class="contact-item" data-aos="fade-up-right" data-aos-delay="100">
-                            <i class="fas fa-envelope"></i>
-                            <a href="mailto:samuspcampos@gmail.com" class="contact-link">samuspcampos@gmail.com</a>
-                        </div>
-                        <div class="contact-item" data-aos="fade-up-right" data-aos-delay="200">
-                            <i class="fas fa-phone"></i>
-                            <span>19989507788</span>
-                        </div>
-                        <div class="contact-item" data-aos="fade-up-right" data-aos-delay="300">
-                            <i class="fab fa-linkedin"></i>
-                            <a href="https://www.linkedin.com/in/samuel-santana-7623402b8/" target="_blank" rel="noopener noreferrer" class="contact-link">linkedin.com/in/samuel-santana-7623402b8</a>
-                        </div>
-                        <div class="contact-item" data-aos="fade-up-right" data-aos-delay="400">
-                            <i class="fab fa-github"></i>
-                            <a href="https://github.com/Sah123campos" target="_blank" rel="noopener noreferrer" class="contact-link">github.com/Sah123campos</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <!-- CONTATO -->
+    <section id="contato" class="section contact" aria-labelledby="contato-title" data-stop="Contato">
+      <div class="contact__inner">
+        <h2 id="contato-title" class="section-title" data-reveal>Contato</h2>
+        <p class="contact__lede" data-reveal>Tem um projeto, uma vaga ou uma dúvida sobre algum dos meus trabalhos? Respondo por e-mail ou WhatsApp.</p>
+        <a class="contact__email" href="mailto:samuspcampos@gmail.com" data-reveal>samuspcampos@gmail.com</a>
+        <div class="contact__actions" data-reveal>
+          <button class="button button--line" type="button" data-copy="samuspcampos@gmail.com"><span data-copy-label>Copiar e-mail</span></button>
+          <span class="visually-hidden" role="status" aria-live="polite" data-copy-status></span>
         </div>
+        <ul class="contact__links" role="list" data-reveal>
+          <li><a href="https://www.linkedin.com/in/samuel-santana-7623402b8/" target="_blank" rel="noopener">LinkedIn<span class="visually-hidden"> (abre em nova aba)</span></a></li>
+          <li><a href="https://github.com/Sah123campos" target="_blank" rel="noopener">GitHub<span class="visually-hidden"> (abre em nova aba)</span></a></li>
+          <li><a href="https://wa.me/5519989507788?text=Ol%C3%A1%2C%20Samuel!%20Vi%20seu%20portf%C3%B3lio." target="_blank" rel="noopener">WhatsApp<span class="visually-hidden"> (abre em nova aba)</span></a></li>
+          <li><a href="https://www.instagram.com/_samusantana_/" target="_blank" rel="noopener">Instagram<span class="visually-hidden"> (abre em nova aba)</span></a></li>
+        </ul>
+      </div>
     </section>
+  </main>
 
-    <!-- WhatsApp Flutuante -->
-    <a href="https://wa.me/5519989507788?text=Olá! Vi seu portfólio e gostaria de conversar sobre oportunidades." 
-       class="whatsapp-float" 
-       target="_blank" 
-       rel="noopener noreferrer"
-       data-aos="fade-up"
-       data-aos-delay="500"
-       onclick="console.log('WhatsApp clicado via HTML');">
-        <i class="fab fa-whatsapp"></i>
-    </a>
+  <footer class="site-footer">
+    <p>© <span data-year>2026</span> Samuel Santana</p>
+    <p>Feito à mão com Three.js, GSAP e Lenis.</p>
+  </footer>
 
-    <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2024 - Desenvolvedor Full Stack. Todos os direitos reservados.</p>
-        </div>
-    </footer>
-
-    <!-- AOS JavaScript -->
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
-    <script src="script.js"></script>
+  <div class="cursor" aria-hidden="true"><span class="cursor__dot"></span><span class="cursor__ring"></span></div>
 </body>
 </html>

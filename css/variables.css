@@ -1,0 +1,64 @@
+/*
+ * Tokens de design — Portfólio Samuel Santana (versão imersiva 3D)
+ *
+ * Conceito: a página é uma órbita. Um núcleo de partículas no centro,
+ * os projetos girando ao redor como telas, e a rolagem conduz a câmera.
+ * Visual escuro único (como os projetos 3D do Samuel), sem tema claro.
+ *
+ *   --void    #050A14  fundo do espaço
+ *   --deep    #0B1628  painéis
+ *   --star    #E9EEF5  texto principal
+ *   --mist    #8D9BB0  texto secundário
+ *   --line    #1E2C44  linhas e bordas
+ *   --spring  #8BD45A  acento (verde do Spring, foco técnico do Samuel)
+ *   --glow    #5EA8FF  brilho frio secundário (só em detalhes de luz)
+ */
+
+:root {
+  color-scheme: dark;
+
+  --void: #050a14;
+  --deep: #0b1628;
+  --star: #e9eef5;
+  --mist: #8d9bb0;
+  --line: #1e2c44;
+  --spring: #8bd45a;
+  --glow: #5ea8ff;
+  --panel: rgb(8 16 30 / 0.78);
+
+  --font-display: "Bricolage Grotesque", "Arial Narrow", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+
+  /* Escala modular (razão ~1.25), fluida */
+  --step--2: clamp(0.72rem, 0.7rem + 0.1vw, 0.78rem);
+  --step--1: clamp(0.83rem, 0.8rem + 0.15vw, 0.9rem);
+  --step-0: clamp(1rem, 0.96rem + 0.2vw, 1.125rem);
+  --step-1: clamp(1.2rem, 1.1rem + 0.45vw, 1.45rem);
+  --step-2: clamp(1.7rem, 1.3rem + 1.6vw, 2.6rem);
+  --step-3: clamp(2.2rem, 1.5rem + 3vw, 4rem);
+  --step-hero: clamp(4rem, 1.2rem + 11vw, 12.5rem);
+
+  --space-xs: 0.5rem;
+  --space-s: 1rem;
+  --space-m: 1.5rem;
+  --space-l: clamp(2rem, 1.5rem + 2vw, 3rem);
+  --space-xl: clamp(4rem, 3rem + 5vw, 8rem);
+
+  --gutter-l: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+
+  --max: 78rem;
+  --measure: 60ch;
+  --header-h: 4.25rem;
+
+  --radius: 14px;
+  --radius-pill: 999px;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (min-width: 48em) {
+  :root {
+    --gutter-l: max(clamp(24px, 4vw, 56px), env(safe-area-inset-left, 0px));
+    --gutter-r: max(clamp(24px, 4vw, 56px), env(safe-area-inset-right, 0px));
+  }
+}
