@@ -12,6 +12,7 @@ O site é uma **experiência 3D guiada pela rolagem** (*scroll storytelling*), n
 - **GSAP + ScrollTrigger** transformam a posição da rolagem em parâmetros da câmera: ela sai do núcleo, entra na órbita, para em cada tela e no fim sobe para mostrar o anel de cima.
 - **Lenis** deixa a rolagem suave.
 - **UnrealBloomPass** dá o brilho neon nas molduras e no núcleo.
+- **Repulsão do cursor**: um raio sai da câmera na direção do mouse, acha onde toca o núcleo e o shader empurra as partículas próximas para fora; quando o mouse sai, elas assentam de volta devagar.
 
 A câmera não é animada por linha do tempo fixa. A cada quadro ela lê o estado da rolagem e o persegue com amortecimento, girando pelo arco da órbita (nunca cortando por dentro do anel).
 
@@ -68,6 +69,7 @@ O anel se redistribui sozinho para qualquer número de projetos, e a altura da s
 | Velocidade da câmera | `const k = 1 - Math.exp(-dt * 4.5)` em `js/scene.js` (maior = mais rápida) |
 | Quanto a câmera "pausa" em cada tela | `smooth(0.3, 0.7, …)` em `js/main.js` (intervalo menor = pausa mais longa) |
 | Intensidade do brilho | `new UnrealBloomPass(…, 0.75, 0.45, 0.86)` — força, raio, limiar |
+| Força e alcance do espalhamento com o mouse | `fall` e `p += (away * 1.4 …)` no vertex shader de `createCore`, em `js/scene.js` |
 | Partículas do núcleo | `createCore(mobile ? 3200 : 7000)` |
 | Altura da rolagem da órbita | `.is-3d .orbit { height: calc(var(--n) * 90svh) }` em `css/layout.css` |
 

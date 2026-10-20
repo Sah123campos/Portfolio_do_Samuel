@@ -77,11 +77,15 @@ function createCore(count) {
       uOpacity: { value: 1 },
       uColorA: { value: SPRING.clone() },
       uColorB: { value: GLOW.clone() },
+      uMouse: { value: new THREE.Vector3(0, 0, 99) },
+      uMouseForce: { value: 0 },
     },
     vertexShader: /* glsl */ `
       attribute vec3 aScatter;
       attribute float aRand;
-      uniform float uTime, uAssemble, uRadius, uSize, uPixelRatio;
+      uniform float uTime, uAssemble, uRadius, uSize, uPixelRatio, uMouseForce;
+      uniform vec3 uMouse;
+      varying float vPush;
       uniform vec3 uColorA, uColorB;
       varying vec3 vColor;
       varying float vAlpha;
@@ -93,11 +97,25 @@ function createCore(count) {
         // Cada ponto chega num tempo diferente: a montagem parece orgânica
         float a = smoothstep(aRand * 0.45, 0.55 + aRand * 0.45, uAssemble);
         vec3 p = mix(aScatter, shell, a);
+
+        // Repulsão do cursor: pontos perto de onde o mouse toca a esfera
+        // são empurrados para fora e para longe, cada um com força própria
+        float md = distance(p, uMouse);
+        float fall = 1.0 - smoothstep(0.0, 1.8 + aRand * 0.5, md);
+        float push = fall * fall * uMouseForce;
+        vec3 away = normalize(p - uMouse + 1e-4);
+        vec3 outward = normalize(p);
+        vec3 swirl = normalize(cross(outward, vec3(0.0, 1.0, 0.0)) + 1e-4);
+        p += (away * 1.4 + outward * 1.1 + swirl * (aRand - 0.5) * 1.2) * push * (1.0 + aRand * 2.2);
+        vPush = push;
+
         vec4 mv = modelViewMatrix * vec4(p, 1.0);
         gl_PointSize = uSize * uPixelRatio * (0.45 + aRand * 0.8) / -mv.z;
         gl_Position = projectionMatrix * mv;
         vColor = mix(uColorA, uColorB, smoothstep(-0.9, 0.9, position.y + n * 1.4));
+        vColor = mix(vColor, vec3(0.85, 1.0, 0.75), vPush * 0.55);
         vAlpha = (0.45 + 0.55 * aRand) * (0.35 + 0.65 * a);
+        gl_PointSize *= 1.0 + vPush * 0.6;
       }
     `,
     fragmentShader: /* glsl */ `
@@ -295,7 +313,7 @@ export function createScene(canvas, projects, { mobile = false } = {}) {
   composer.addPass(new OutputPass());
 
   /* Estado vindo da rolagem (escrito por main.js) */
-  const state = { hero: 0, orbit: 0, outro: 0, px: 0, py: 0, assemble: 0 };
+  const state = { hero: 0, orbit: 0, outro: 0, px: 0, py: 0, assemble: 0, pointerActive: false };
 
   let width = 1;
   let height = 1;
@@ -325,6 +343,14 @@ export function createScene(canvas, projects, { mobile = false } = {}) {
   }
 
   const tmpPos = new THREE.Vector3();
+  const raycaster = new THREE.Raycaster();
+  const ndc = new THREE.Vector2();
+  const hitSphere = new THREE.Sphere();
+  const sphereCenter = new THREE.Vector3();
+  const hitPoint = new THREE.Vector3();
+  const localHit = new THREE.Vector3();
+  const mouseLocal = new THREE.Vector3(0, 0, 99);
+  let mouseForce = 0;
   const tmpTarget = new THREE.Vector3();
   const smoothed = { hero: 0, orbit: 0, outro: 0, px: 0, py: 0 };
   const offset = { x: 0, y: 0 };
@@ -388,7 +414,27 @@ export function createScene(canvas, projects, { mobile = false } = {}) {
     camera.setViewOffset(width, height, -curOffset.x * width, curOffset.y * height, width, height);
 
     // Núcleo
+    // Cursor sobre a esfera: acha onde o raio do mouse toca o núcleo
+    // e leva esse ponto para o espaço local das partículas
     const cu = core.material.uniforms;
+    let targetForce = 0;
+    if (state.pointerActive) {
+      ndc.set(state.px, -state.py);
+      camera.updateMatrixWorld();
+      raycaster.setFromCamera(ndc, camera);
+      core.updateMatrixWorld();
+      hitSphere.set(core.getWorldPosition(sphereCenter), cu.uRadius.value + 0.35);
+      if (raycaster.ray.intersectSphere(hitSphere, hitPoint)) {
+        core.worldToLocal(localHit.copy(hitPoint));
+        if (mouseLocal.z > 50) mouseLocal.copy(localHit);
+        mouseLocal.lerp(localHit, 1 - Math.exp(-dt * 14));
+        targetForce = (1 - h) * (1 - u);
+      }
+    }
+    // Força sobe rápido e desce devagar: a nuvem "assenta" de volta
+    mouseForce += (targetForce - mouseForce) * (1 - Math.exp(-dt * (targetForce > mouseForce ? 7 : 2.2)));
+    cu.uMouse.value.copy(mouseLocal);
+    cu.uMouseForce.value = mouseForce;
     cu.uTime.value = t;
     cu.uAssemble.value = state.assemble;
     cu.uRadius.value = 2.4 - h * 0.5 + u * 0.4;

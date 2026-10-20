@@ -276,7 +276,11 @@ async function start3D() {
   window.addEventListener("pointermove", (e) => {
     state.px = (e.clientX / window.innerWidth - 0.5) * 2;
     state.py = (e.clientY / window.innerHeight - 0.5) * 2;
+    state.pointerActive = true;
   }, { passive: true });
+  document.documentElement.addEventListener("pointerleave", () => { state.pointerActive = false; });
+  window.addEventListener("pointerup", (e) => { if (e.pointerType === "touch") state.pointerActive = false; });
+  window.addEventListener("blur", () => { state.pointerActive = false; });
 
   if (finePointer) setupCursor(gsap);
 
