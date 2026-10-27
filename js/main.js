@@ -11,6 +11,7 @@ import { setupStack } from "./ui/stack.js";
 import { setupCramer } from "./ui/cramer.js";
 import { setupNav } from "./ui/nav.js";
 import { setupPointer } from "./ui/pointer.js";
+import { travel } from "./ui/travel.js";
 
 const root = document.documentElement;
 const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -71,6 +72,7 @@ async function startScene() {
   scene = createScene(canvas, {
     mobile: coarse || window.innerWidth < 768,
     reducedMotion: reduceMotion,
+    travel,
     onContextLost() {
       root.classList.remove("is-3d", "will-3d");
       scene?.destroy();

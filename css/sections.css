@@ -487,6 +487,34 @@
 }
 
 .works.is-diagonal .works__list { display: block; height: 100%; }
+
+/* Camadas de paralaxe: números gigantes ao fundo, partículas na frente */
+.works__ghosts,
+.works__dust { display: none; }
+.works.is-diagonal .works__ghosts,
+.works.is-diagonal .works__dust { display: block; position: absolute; inset: 0; pointer-events: none; }
+.works.is-diagonal .works__dust { z-index: 150; }
+.works__ghost {
+  position: absolute;
+  left: calc(var(--cx) - var(--card-w) * 0.55);
+  top: calc(var(--cy) - var(--card-w) * 0.42);
+  font-family: var(--font-display);
+  font-size: clamp(7rem, 4rem + 16vw, 22rem);
+  font-weight: 800;
+  line-height: 1;
+  color: transparent;
+  -webkit-text-stroke: 1px color-mix(in srgb, var(--accent, var(--violet)) 35%, transparent);
+  will-change: transform, opacity;
+}
+.works__mote {
+  position: absolute;
+  left: 0;
+  top: 0;
+  border-radius: 50%;
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan);
+  will-change: transform;
+}
 .works.is-diagonal .project,
 .works.is-diagonal .project__article { position: static; display: block; }
 

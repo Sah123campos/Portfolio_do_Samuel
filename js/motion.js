@@ -4,6 +4,8 @@
  * Só roda quando as bibliotecas carregaram. Com "menos movimento" ativo,
  * as animações ficam mais rápidas e a rolagem fica nativa (sem inércia).
  */
+import { travel } from "./ui/travel.js";
+
 const escapeHTML = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
 /* Divide o texto em palavras com máscara; data-glow destaca palavras com luz */
@@ -196,10 +198,14 @@ function refreshLater(ScrollTrigger) {
 }
 
 /*
- * Galeria diagonal: o palco fica preso na tela enquanto a rolagem desliza a fila
- * de projetos ao longo de uma diagonal. O próximo sobe do canto inferior direito,
- * o anterior sai pelo superior esquerdo; o ativo fica no centro, maior e nítido,
- * com o texto dele ao lado.
+ * Galeria diagonal: o palco fica preso na tela e a rolagem "leva a câmera" por
+ * uma diagonal. Camadas em velocidades diferentes dão a profundidade:
+ *   fundo     cena 3D (estrelas e planeta), via js/ui/travel.js
+ *   meio      números gigantes dos projetos (0,4×)
+ *   principal cards, com profundidade real (translateZ) (1×)
+ *   frente    partículas que passam rápido (1,8×)
+ * O ativo fica no centro com o texto ao lado; ao parar de rolar, a galeria
+ * se encaixa no projeto mais próximo.
  */
 function setupWorks({ gsap, ScrollTrigger, getLenis }) {
   const works = document.querySelector("[data-works]");
@@ -214,20 +220,52 @@ function setupWorks({ gsap, ScrollTrigger, getLenis }) {
   const last = items.length - 1;
   const pad = (n) => String(n).padStart(2, "0");
   if (total) total.textContent = pad(items.length);
+  travel.n = items.length;
+
+  /* Camada do meio: números gigantes */
+  const ghostWrap = works.querySelector("[data-works-ghosts]");
+  const ghosts = items.map((p, i) => {
+    const g = document.createElement("span");
+    g.className = "works__ghost";
+    g.textContent = pad(i + 1);
+    g.style.setProperty("--accent", p.style.getPropertyValue("--accent"));
+    ghostWrap?.append(g);
+    return g;
+  });
+
+  /* Camada da frente: partículas */
+  const dustWrap = works.querySelector("[data-works-dust]");
+  const rand = (n) => { const x = Math.sin(n * 91.7) * 43758.5453; return x - Math.floor(x); };
+  const dust = Array.from({ length: window.innerWidth < 768 ? 10 : 22 }, (_, i) => {
+    const d = document.createElement("span");
+    d.className = "works__mote";
+    const size = 2 + rand(i + 3) * 5;
+    d.style.width = d.style.height = `${size.toFixed(1)}px`;
+    d.style.opacity = (0.25 + rand(i + 7) * 0.5).toFixed(2);
+    if (size > 5) d.style.filter = "blur(1.5px)";
+    dustWrap?.append(d);
+    return { el: d, bx: rand(i + 1), by: rand(i + 2), k: 1.3 + rand(i + 5) * 1.2 };
+  });
 
   works.classList.add("is-diagonal");
 
   let step = { x: 0, y: 0 };
+  let vw = window.innerWidth;
+  let vh = window.innerHeight;
   const measure = () => {
     const w = frames[0].offsetWidth;
     const h = frames[0].offsetHeight;
-    const wide = window.innerWidth >= 1024;
+    vw = window.innerWidth;
+    vh = window.innerHeight;
+    const wide = vw >= 1024;
     // passo entre um projeto e o próximo, ao longo da diagonal
     step = wide ? { x: w * 0.74, y: h * 0.78 } : { x: w * 0.62, y: h * 0.72 };
   };
 
+  const wrap = (v, m) => ((v % m) + m) % m;
   let target = 0;
   let current = 0;
+  let vel = 0;
   let active = -1;
 
   const st = ScrollTrigger.create({
@@ -239,9 +277,11 @@ function setupWorks({ gsap, ScrollTrigger, getLenis }) {
     invalidateOnRefresh: true,
     onRefresh: () => { measure(); render(true); },
     onUpdate: (self) => { target = self.progress * last; },
+    onToggle: (self) => { travel.on = self.isActive ? 1 : 0; },
   });
 
   function render(force) {
+    const lean = Math.max(-1, Math.min(1, vel * 6)); // inclinação conforme a velocidade
     for (let i = 0; i < items.length; i++) {
       const d = i - current;
       const a = Math.min(Math.abs(d), 3);
@@ -252,15 +292,30 @@ function setupWorks({ gsap, ScrollTrigger, getLenis }) {
         yPercent: -50,
         x: d * step.x,
         y: d * step.y,
-        scale: 1 - a * 0.16,
-        // leve giro em 3D: os cards parecem uma fila no espaço, não só deslocados
-        rotationY: -9,
-        rotationX: 4,
+        z: -a * 360, // profundidade real: os vizinhos ficam mais longe da câmera
+        rotationY: -9 - lean * 6,
+        rotationX: 4 + lean * 2,
+        rotationZ: -lean * 1.5,
         transformPerspective: 1600,
         autoAlpha: alpha,
         zIndex: 100 - Math.round(a * 10),
       });
+      // números gigantes: mesma diagonal, menos da metade da velocidade
+      if (ghosts[i]) {
+        gsap.set(ghosts[i], {
+          x: d * step.x * 0.4,
+          y: d * step.y * 0.4,
+          autoAlpha: Math.max(0, 1 - Math.abs(d) * 0.8),
+        });
+      }
     }
+    // partículas: passam mais rápido que os cards e dão a volta na tela
+    for (const m of dust) {
+      const x = wrap(m.bx * vw * 1.2 - current * step.x * m.k, vw * 1.2) - vw * 0.1;
+      const y = wrap(m.by * vh * 1.2 - current * step.y * m.k, vh * 1.2) - vh * 0.1;
+      m.el.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
+    }
+    travel.t = current;
     if (bar) bar.parentElement.style.setProperty("--p", (current / last).toFixed(4));
     const next = Math.round(current);
     if (next !== active) setActive(next, force);
@@ -279,24 +334,34 @@ function setupWorks({ gsap, ScrollTrigger, getLenis }) {
     if (prev) gsap.set(prev.querySelectorAll("[data-anim]"), { clearProps: "all" });
   }
 
-  // aproxima a posição atual da rolagem aos poucos: o deslizar fica macio
+  // a posição na tela persegue a rolagem com amortecimento: começa e termina suave
   gsap.ticker.add(() => {
     const diff = target - current;
-    if (Math.abs(diff) < 0.0005) {
-      if (current !== target) { current = target; render(); }
+    if (Math.abs(diff) < 0.0005 && Math.abs(vel) < 0.0005) {
+      if (current !== target) { current = target; vel = 0; render(); }
       return;
     }
-    current += diff * 0.12;
+    const prev = current;
+    current += diff * 0.09;
+    vel += (current - prev - vel) * 0.25;
     render();
   });
 
-  const goTo = (i) => {
-    const y = st.start + (st.end - st.start) * (i / last);
+  const posOf = (i) => st.start + (st.end - st.start) * (i / last);
+  const goTo = (i, duration = 1.3) => {
     const lenis = getLenis();
-    if (lenis) lenis.scrollTo(y, { duration: 1.2 });
-    else window.scrollTo({ top: y, behavior: "smooth" });
+    if (lenis) lenis.scrollTo(posOf(i), { duration, easing: (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2) });
+    else window.scrollTo({ top: posOf(i), behavior: "smooth" });
   };
   dots.forEach((b) => b.addEventListener("click", () => goTo(Number(b.dataset.go))));
+
+  // ao parar de rolar (roda, trackpad ou toque), encaixa no projeto mais próximo
+  ScrollTrigger.addEventListener("scrollEnd", () => {
+    if (!st.isActive) return;
+    const p = st.progress * last;
+    const i = Math.round(p);
+    if (Math.abs(p - i) > 0.02) goTo(i, 0.8);
+  });
 
   // clicar num projeto que não é o ativo traz ele para o centro
   frames.forEach((f, i) => f.addEventListener("click", (e) => {

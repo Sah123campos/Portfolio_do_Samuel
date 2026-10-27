@@ -224,6 +224,8 @@ function createStarLayer(count, depth, size, dot) {
     blending: THREE.AdditiveBlending,
     uniforms: {
       uOffset: { value: 0 },
+      uOffsetX: { value: 0 },
+      uWidth: { value: depth * 2.2 },
       uRange: { value: range },
       uTime: { value: 0 },
       uSize: { value: size },
@@ -233,12 +235,14 @@ function createStarLayer(count, depth, size, dot) {
     },
     vertexShader: /* glsl */ `
       attribute float aTw;
-      uniform float uOffset, uRange, uTime, uSize, uPixelRatio;
+      uniform float uOffset, uOffsetX, uWidth, uRange, uTime, uSize, uPixelRatio;
       varying float vA;
       void main() {
         vec3 p = position;
         // Rolagem infinita: as estrelas voltam por baixo quando saem por cima
         p.y = mod(p.y + uOffset + uRange * 0.5, uRange) - uRange * 0.5;
+        // Na galeria de projetos elas também correm de lado (viagem na diagonal)
+        p.x = mod(p.x + uOffsetX + uWidth * 0.5, uWidth) - uWidth * 0.5;
         vec4 mv = modelViewMatrix * vec4(p, 1.0);
         gl_PointSize = uSize * uPixelRatio * (0.5 + aTw) * 60.0 / -mv.z;
         gl_Position = projectionMatrix * mv;
@@ -294,7 +298,7 @@ function createOrbits(dot) {
 }
 
 /* ---------- Cena ---------- */
-export function createScene(canvas, { mobile = false, reducedMotion = false, onContextLost } = {}) {
+export function createScene(canvas, { mobile = false, reducedMotion = false, onContextLost, travel = null } = {}) {
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: false, powerPreference: "high-performance", alpha: false });
   renderer.setClearColor(BG, 1);
 
@@ -367,7 +371,7 @@ export function createScene(canvas, { mobile = false, reducedMotion = false, onC
   }
 
   /* Valores atuais (amortecidos) */
-  const cur = { chapter: 0, scroll: 0, px: 0, py: 0, intro: state.intro };
+  const cur = { chapter: 0, scroll: 0, px: 0, py: 0, intro: state.intro, travel: 0, on: 0, vel: 0 };
   const colA = new THREE.Color();
   const colB = new THREE.Color();
   const tmpA = new THREE.Color();
@@ -426,6 +430,16 @@ export function createScene(canvas, { mobile = false, reducedMotion = false, onC
     cur.py += (state.py - cur.py) * k * 0.7;
     cur.intro += (state.intro - cur.intro) * (1 - Math.exp(-dtRaw * 1.6));
 
+    // Viagem pela galeria de projetos: posição amortecida e velocidade
+    const tv = travel || { t: 0, on: 0, n: 1 };
+    const prevT = cur.travel;
+    cur.travel += (tv.t - cur.travel) * (1 - Math.exp(-dtRaw * 4.5));
+    cur.on += (tv.on - cur.on) * (1 - Math.exp(-dtRaw * 2.4));
+    const v = (cur.travel - prevT) / Math.max(dtRaw, 1e-3);
+    cur.vel += (v - cur.vel) * (1 - Math.exp(-dtRaw * 5));
+    const T = cur.travel * cur.on;
+    const span = Math.max(1, tv.n - 1);
+
     // Interpola entre os dois quadros-chave vizinhos
     const c = Math.min(Math.max(cur.chapter, 0), KEYS.length - 1);
     const i0 = Math.floor(c);
@@ -436,6 +450,10 @@ export function createScene(canvas, { mobile = false, reducedMotion = false, onC
     const P = narrow ? "posN" : "pos";
 
     rig.position.set(lerp(A[P][0], B[P][0], f), lerp(A[P][1], B[P][1], f), lerp(A[P][2], B[P][2], f));
+    // Plano do meio: o planeta atravessa a galeria devagar, na mesma diagonal dos cards
+    const g = T / span;
+    rig.position.x += -g * (narrow ? 1.6 : 4.2) * cur.on;
+    rig.position.y += g * (narrow ? 0.8 : 1.8) * cur.on;
     rig.scale.setScalar(lerp(A.scale, B.scale, f) * (narrow ? 0.82 : 1));
 
     const u = core.material.uniforms;
@@ -451,7 +469,7 @@ export function createScene(canvas, { mobile = false, reducedMotion = false, onC
     u.uAssemble.value = state.assemble;
 
     const spin = lerp(A.spin, B.spin, f);
-    core.rotation.y += dt * 0.08 * spin;
+    core.rotation.y += dt * 0.08 * spin + (cur.travel - prevT) * 0.35 * cur.on;
     core.rotation.x = Math.sin(time * 0.1) * 0.12 + cur.py * 0.1;
     core.rotation.z = cur.px * -0.06;
 
@@ -471,15 +489,23 @@ export function createScene(canvas, { mobile = false, reducedMotion = false, onC
 
     // Estrelas: cada camada sobe numa velocidade (profundidade)
     stars.forEach((s, n) => {
-      s.material.uniforms.uOffset.value = cur.scroll * [1.2, 2.6, 5.5][n];
+      // fundo: cada camada de estrelas corre numa velocidade (as próximas mais rápido)
+      s.material.uniforms.uOffset.value = cur.scroll * [1.2, 2.6, 5.5][n] + cur.travel * [0.5, 1.2, 2.6][n];
+      s.material.uniforms.uOffsetX.value = -cur.travel * [0.9, 2.1, 4.6][n];
       s.material.uniforms.uTime.value = time;
     });
 
     // Câmera: entrada (aproximação) + paralaxe do ponteiro
     const intro = smooth(clamp01(cur.intro));
-    camera.position.set(cur.px * 0.6, -cur.py * 0.35 + (1 - intro) * 1.5, lerp(22, narrow ? 15 : 13, intro));
-    camera.lookAt(cur.px * 0.15, (1 - intro) * 0.8, 0);
-    camera.rotation.z += (1 - intro) * 0.06;
+    // Na galeria: a câmera recua no meio de cada troca e avança ao chegar,
+    // se inclina para o lado do movimento e "derrapa" um pouco na curva
+    const frac = T - Math.floor(T);
+    const vel = Math.max(-3, Math.min(3, cur.vel)) * cur.on;
+    const dolly = Math.sin(Math.PI * frac) * (narrow ? 1.6 : 2.6) * cur.on;
+    const lean = vel * 0.35;
+    camera.position.set(cur.px * 0.6 + lean, -cur.py * 0.35 + (1 - intro) * 1.5 - lean * 0.6, lerp(22, narrow ? 15 : 13, intro) + dolly);
+    camera.lookAt(cur.px * 0.15 + lean * 0.4, (1 - intro) * 0.8 - lean * 0.25, 0);
+    camera.rotation.z += (1 - intro) * 0.06 - vel * 0.035;
 
     // Cursor sobre o núcleo (só quando ele é esfera e está em destaque)
     let targetForce = 0;
