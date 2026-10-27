@@ -98,45 +98,13 @@ export function startMotion({ gsap, ScrollTrigger, Lenis, reduceMotion }) {
     if (rest.length) tl.from(rest, { y: 30, autoAlpha: 0, duration: 1, stagger: 0.08, ease: "power3.out" }, 0.35);
   });
 
-  /* ---------- Projetos: chegam na diagonal, presos à rolagem ----------
-     Cada projeto sobe de um canto inferior (alternando esquerda e direita)
-     conforme a página desce; ao voltar a rolagem, ele recua pelo mesmo caminho. */
-  const amp = reduceMotion ? 0.35 : 1; // distâncias menores com "menos movimento"
-  // dir: -1 vem da esquerda, 1 da direita; pode ser função (recalculada ao redimensionar)
-  const diagonal = (card, dir, parts) => {
-    const d = typeof dir === "function" ? dir : () => dir;
-    const tl = gsap.timeline({
-      defaults: { ease: "none" },
-      scrollTrigger: { trigger: card, start: "top 98%", end: "top 45%", scrub: 0.8, invalidateOnRefresh: true },
-    });
-    tl.fromTo(card,
-      { x: () => d() * 140 * amp, y: 160 * amp, rotate: () => d() * 2.5 * amp, autoAlpha: 0 },
-      { x: 0, y: 0, rotate: 0, autoAlpha: 1, duration: 1 }, 0);
-    if (parts?.length) {
-      tl.fromTo(parts,
-        { x: () => d() * 50 * amp, y: 40 * amp, autoAlpha: 0 },
-        { x: 0, y: 0, autoAlpha: 1, duration: 0.55, stagger: 0.05 }, 0.3);
-    }
-    return tl;
-  };
-
-  document.querySelectorAll(".project").forEach((p) => {
-    const article = p.querySelector(".project__article");
-    const parts = p.querySelectorAll("[data-anim]");
-    diagonal(article, () => projectDir(p), parts);
-    const ghost = p.querySelector(".project__ghost");
-    if (ghost) {
-      gsap.fromTo(ghost, { y: 80 }, { y: -80, ease: "none", scrollTrigger: { trigger: p, start: "top bottom", end: "bottom top", scrub: true } });
-    }
-  });
-
-  /* Órbita que conecta os destaques: uma luz percorre o caminho com a rolagem */
-  setupGalleryOrbit(gsap, ScrollTrigger);
+  /* ---------- Projetos: galeria diagonal ---------- */
+  setupWorks({ gsap, ScrollTrigger, getLenis: () => lenis });
 
   /* ---------- Cramer: o bloco se aproxima e os símbolos flutuam em camadas ---------- */
   const cramer = document.querySelector(".cramer");
   if (cramer) {
-    diagonal(cramer, 1);
+    gsap.from(cramer, { y: 80, autoAlpha: 0, scale: 0.97, duration: 1.4, ease: "expo.out", scrollTrigger: { trigger: cramer, start: "top 85%", once: true } });
     cramer.querySelectorAll(".cramer__bg span").forEach((s, i) => {
       gsap.to(s, { y: (i % 2 ? -1 : 1) * (40 + i * 18), ease: "none", scrollTrigger: { trigger: cramer, start: "top bottom", end: "bottom top", scrub: true } });
     });
@@ -222,78 +190,125 @@ export function startMotion({ gsap, ScrollTrigger, Lenis, reduceMotion }) {
   return { lenis };
 }
 
-/* De que lado o projeto chega: pela coluna em que ele está na tela.
-   Em coluna única (celular) e nos destaques, alterna esquerda/direita. */
-function projectDir(p) {
-  const list = p.parentElement;
-  const box = list.getBoundingClientRect();
-  const r = p.getBoundingClientRect();
-  if (r.width > box.width * 0.8) {
-    if (p.classList.contains("project--feature")) return p.classList.contains("is-flip") ? 1 : -1;
-    return [...list.children].indexOf(p) % 2 ? 1 : -1;
-  }
-  const off = (r.left + r.width / 2 - (box.left + box.width / 2)) / (box.width / 2);
-  return Math.abs(off) < 0.2 ? 0.35 : Math.sign(off);
-}
-
 function refreshLater(ScrollTrigger) {
   window.addEventListener("load", () => ScrollTrigger.refresh());
   document.fonts?.ready.then(() => ScrollTrigger.refresh());
 }
 
-/* Caminho curvo entre os centros das imagens em destaque, com uma luz que o percorre */
-function setupGalleryOrbit(gsap, ScrollTrigger) {
-  const svg = document.querySelector("[data-gallery-orbit]");
-  const wrap = svg?.parentElement;
-  if (!svg || !wrap) return;
-  const ns = "http://www.w3.org/2000/svg";
-  svg.innerHTML = '<defs><linearGradient id="orbitGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9d8cff"/><stop offset="1" stop-color="#7fe3ff"/></linearGradient></defs>';
-  const path = document.createElementNS(ns, "path");
-  const dot = document.createElementNS(ns, "circle");
-  dot.setAttribute("r", "4");
-  svg.append(path, dot);
+/*
+ * Galeria diagonal: o palco fica preso na tela enquanto a rolagem desliza a fila
+ * de projetos ao longo de uma diagonal. O próximo sobe do canto inferior direito,
+ * o anterior sai pelo superior esquerdo; o ativo fica no centro, maior e nítido,
+ * com o texto dele ao lado.
+ */
+function setupWorks({ gsap, ScrollTrigger, getLenis }) {
+  const works = document.querySelector("[data-works]");
+  const items = works ? [...works.querySelectorAll(".project")] : [];
+  if (items.length < 2) return;
+  const stage = works.querySelector(".works__stage");
+  const frames = items.map((p) => p.querySelector(".project__frame"));
+  const dots = [...works.querySelectorAll("[data-go]")];
+  const num = works.querySelector("[data-works-num]");
+  const bar = works.querySelector("[data-works-bar]");
+  const total = works.querySelector("[data-works-total]");
+  const last = items.length - 1;
+  const pad = (n) => String(n).padStart(2, "0");
+  if (total) total.textContent = pad(items.length);
 
-  let len = 0;
-  let progress = 0;
-  function build() {
-    // posição de layout (offset*), que ignora o deslocamento da entrada na diagonal
-    const pos = (node) => {
-      let x = 0, y = 0;
-      for (let n = node; n && n !== wrap; n = n.offsetParent) { x += n.offsetLeft; y += n.offsetTop; }
-      return { x, y };
-    };
-    const pts = [...wrap.querySelectorAll(".project__visual")].map((v) => {
-      const o = pos(v);
-      const flip = v.closest(".project").classList.contains("is-flip");
-      // ponto na borda interna da imagem, voltado para o texto
-      return { x: flip ? o.x : o.x + v.offsetWidth, y: o.y + v.offsetHeight / 2 };
-    });
-    if (pts.length < 2) return;
-    let d = `M${pts[0].x} ${pts[0].y}`;
-    for (let i = 1; i < pts.length; i++) {
-      const a = pts[i - 1];
-      const b = pts[i];
-      const midY = (a.y + b.y) / 2;
-      d += ` C${a.x} ${midY}, ${b.x} ${midY}, ${b.x} ${b.y}`;
-    }
-    path.setAttribute("d", d);
-    len = path.getTotalLength();
-    place();
-  }
-  function place() {
-    if (!len) return;
-    const p = path.getPointAtLength(len * progress);
-    dot.setAttribute("cx", p.x.toFixed(1));
-    dot.setAttribute("cy", p.y.toFixed(1));
-  }
+  works.classList.add("is-diagonal");
 
-  ScrollTrigger.create({
-    trigger: wrap,
-    start: "top 55%",
-    end: "bottom 55%",
-    onUpdate: (st) => { progress = st.progress; place(); },
-    onRefresh: build,
+  let step = { x: 0, y: 0 };
+  const measure = () => {
+    const w = frames[0].offsetWidth;
+    const h = frames[0].offsetHeight;
+    const wide = window.innerWidth >= 1024;
+    // passo entre um projeto e o próximo, ao longo da diagonal
+    step = wide ? { x: w * 0.74, y: h * 0.78 } : { x: w * 0.62, y: h * 0.72 };
+  };
+
+  let target = 0;
+  let current = 0;
+  let active = -1;
+
+  const st = ScrollTrigger.create({
+    trigger: stage,
+    start: "top top",
+    end: () => `+=${last * window.innerHeight * 0.75}`,
+    pin: true,
+    anticipatePin: 1,
+    invalidateOnRefresh: true,
+    onRefresh: () => { measure(); render(true); },
+    onUpdate: (self) => { target = self.progress * last; },
   });
-  new ResizeObserver(() => build()).observe(wrap);
-  build();
+
+  function render(force) {
+    for (let i = 0; i < items.length; i++) {
+      const d = i - current;
+      const a = Math.min(Math.abs(d), 3);
+      // os que já passaram somem mais rápido, para não cobrir o texto
+      const alpha = d < 0 ? Math.max(0, 1 + d * 1.7) : Math.max(0, 1 - d * 0.42);
+      gsap.set(frames[i], {
+        xPercent: -50,
+        yPercent: -50,
+        x: d * step.x,
+        y: d * step.y,
+        scale: 1 - a * 0.16,
+        // leve giro em 3D: os cards parecem uma fila no espaço, não só deslocados
+        rotationY: -9,
+        rotationX: 4,
+        transformPerspective: 1600,
+        autoAlpha: alpha,
+        zIndex: 100 - Math.round(a * 10),
+      });
+    }
+    if (bar) bar.parentElement.style.setProperty("--p", (current / last).toFixed(4));
+    const next = Math.round(current);
+    if (next !== active) setActive(next, force);
+  }
+
+  function setActive(i, instant) {
+    const prev = items[active];
+    active = i;
+    items.forEach((p, k) => p.classList.toggle("is-active", k === i));
+    dots.forEach((b, k) => (k === i ? b.setAttribute("aria-current", "true") : b.removeAttribute("aria-current")));
+    if (num) num.textContent = pad(i + 1);
+    if (instant) return;
+    // o texto também troca na diagonal: o novo chega de baixo/direita
+    const parts = items[i].querySelectorAll("[data-anim]");
+    gsap.fromTo(parts, { x: 36, y: 28, autoAlpha: 0 }, { x: 0, y: 0, autoAlpha: 1, duration: 0.6, stagger: 0.04, ease: "power3.out", overwrite: true });
+    if (prev) gsap.set(prev.querySelectorAll("[data-anim]"), { clearProps: "all" });
+  }
+
+  // aproxima a posição atual da rolagem aos poucos: o deslizar fica macio
+  gsap.ticker.add(() => {
+    const diff = target - current;
+    if (Math.abs(diff) < 0.0005) {
+      if (current !== target) { current = target; render(); }
+      return;
+    }
+    current += diff * 0.12;
+    render();
+  });
+
+  const goTo = (i) => {
+    const y = st.start + (st.end - st.start) * (i / last);
+    const lenis = getLenis();
+    if (lenis) lenis.scrollTo(y, { duration: 1.2 });
+    else window.scrollTo({ top: y, behavior: "smooth" });
+  };
+  dots.forEach((b) => b.addEventListener("click", () => goTo(Number(b.dataset.go))));
+
+  // clicar num projeto que não é o ativo traz ele para o centro
+  frames.forEach((f, i) => f.addEventListener("click", (e) => {
+    if (i === active) return;
+    e.preventDefault();
+    goTo(i);
+  }));
+
+  // teclado: ao focar um link de outro projeto, a galeria vai até ele
+  items.forEach((p, i) => p.addEventListener("focusin", () => { if (i !== active) goTo(i); }));
+
+  new ResizeObserver(() => { measure(); render(true); }).observe(stage);
+  measure();
+  render(true);
 }

@@ -5,11 +5,12 @@
  * 1. Tire um screenshot da página inicial em 1440×900 e salve em WebP como
  *    assets/images/projects/<id>-1200.webp e <id>-640.webp.
  * 2. Acrescente um objeto em `projects` com os campos abaixo.
- *    - layout: "feature" (grande, com imagem ampla) ou "grid" (cartão na grade).
+ *    - A ordem do array é a ordem da galeria diagonal (01, 02, 03...).
  *    - fx: efeito de passar o mouse ("orbit", "neon", "sweep", "zoom",
  *      "blueprint", "splash", "pixel", "code"). Pode deixar de fora.
  *    - demo/repo: deixe null quando não houver; o cartão se ajusta.
- * A Calculadora de Cramer tem um bloco próprio em index.html.
+ * A Calculadora de Cramer também tem um bloco próprio (com a demonstração)
+ * em index.html; o campo `anchor` leva da galeria até ele.
  */
 export const projects = [
   {
@@ -32,7 +33,6 @@ export const projects = [
     demoLabel: "Fazer a viagem",
     repo: "https://github.com/Sah123campos/sistema-solar",
     accent: "#ffb45e",
-    layout: "feature",
     fx: "orbit",
   },
   {
@@ -55,7 +55,6 @@ export const projects = [
     demoLabel: "Percorrer a jornada",
     repo: "https://github.com/Sah123campos/Loja-de-gamers",
     accent: "#ff4fa3",
-    layout: "feature",
     fx: "neon",
   },
   {
@@ -78,8 +77,30 @@ export const projects = [
     demoLabel: "Abrir o ateliê",
     repo: "https://github.com/Sah123campos/AuraMotors",
     accent: "#d9b25f",
-    layout: "feature",
     fx: "sweep",
+  },
+  {
+    id: "cramer",
+    name: "Calculadora do Método de Cramer",
+    category: "Ferramenta de matemática",
+    year: "2025–2026",
+    summary:
+      "Começou como uma calculadora e virou um site sobre a regra de Cramer em 3D: cada equação é um plano e a solução é o ponto onde os três se cruzam.",
+    built: [
+      "Sistemas 2×2, 3×3 e 4×4 com frações exatas",
+      "Passo a passo que se atualiza enquanto você digita",
+      "Laboratório com matrizes, cônicas e funções",
+    ],
+    role: "Projeto autoral: matemática, visualização 3D e código",
+    stack: ["JavaScript", "Three.js", "GSAP", "node --test"],
+    image: "assets/images/projects/cramer",
+    alt: "Abertura do site Cramer: o título “Três planos. Um ponto.” sobre três planos coloridos que se cruzam em um ponto",
+    demo: "https://sah123campos.github.io/cramer/",
+    demoLabel: "Abrir o laboratório",
+    repo: "https://github.com/Sah123campos/cramer",
+    anchor: "#cramer",
+    accent: "#7fe3ff",
+    fx: "blueprint",
   },
   {
     id: "habileads",
@@ -101,7 +122,6 @@ export const projects = [
     demoLabel: "Ver site no ar",
     repo: "https://github.com/Sah123campos/habileads",
     accent: "#ff5a63",
-    layout: "grid",
     fx: "zoom",
   },
   {
@@ -124,7 +144,6 @@ export const projects = [
     demoLabel: "Ver o site",
     repo: "https://github.com/Sah123campos/engrenagem_3",
     accent: "#4fa3e0",
-    layout: "grid",
     fx: "blueprint",
   },
   {
@@ -147,7 +166,6 @@ export const projects = [
     demoLabel: "Abrir o site",
     repo: "https://github.com/Sah123campos/faisca",
     accent: "#ffb21e",
-    layout: "grid",
     fx: "splash",
   },
   {
@@ -170,7 +188,6 @@ export const projects = [
     demoLabel: "Jogar",
     repo: "https://github.com/Sah123campos/misterio-dos-sinais",
     accent: "#b59bff",
-    layout: "grid",
     fx: "pixel",
   },
   {
@@ -201,7 +218,6 @@ export const projects = [
     demoLabel: null,
     repo: "https://github.com/Sah123campos/ecommerce-pedidos-alfa",
     accent: "#7fe3ff",
-    layout: "grid",
     fx: "code",
   },
 ];

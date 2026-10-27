@@ -42,7 +42,7 @@ function codePanel(lines) {
   return pre;
 }
 
-function renderProject(p, num, flip) {
+function renderProject(p, num) {
   const titleId = `proj-${p.id}`;
   const href = p.demo || p.repo;
 
@@ -60,7 +60,7 @@ function renderProject(p, num, flip) {
       ? el("img", {
           src: `${p.image}-1200.webp`,
           srcset: `${p.image}-640.webp 640w, ${p.image}-1200.webp 1200w`,
-          sizes: p.layout === "feature" ? "(min-width: 64em) 52vw, 92vw" : "(min-width: 64em) 40vw, (min-width: 48em) 46vw, 92vw",
+          sizes: "(min-width: 64em) 46vw, 84vw",
           width: "1200",
           height: "750",
           alt: "",
@@ -83,6 +83,7 @@ function renderProject(p, num, flip) {
     p.repo
       ? el("a", { class: "text-link", href: p.repo, target: "_blank", rel: "noopener" }, [icon("i-github"), "Código no GitHub", newTab()])
       : null,
+    p.anchor ? el("a", { class: "text-link", href: p.anchor }, "Testar aqui na página ↓") : null,
     !p.demo ? el("span", { class: "project__note", text: "Sem demonstração publicada" }) : null,
   ]);
 
@@ -100,21 +101,23 @@ function renderProject(p, num, flip) {
     el("div", { "data-anim": "" }, links),
   ]);
 
-  const cls = ["project", `project--${p.layout}`, `fx-${p.fx || "none"}`, flip ? "is-flip" : ""].filter(Boolean).join(" ");
-  return el("li", { class: cls, style: `--accent:${p.accent}`, "data-project": p.id }, [
-    p.layout === "feature" ? el("span", { class: "project__ghost", "aria-hidden": "true", text: pad(num) }) : null,
-    el("article", { class: "project__article", "aria-labelledby": titleId }, [visual, figure, body]),
+  // A moldura recebe o movimento da galeria; a imagem dentro dela mantém a inclinação do mouse
+  return el("li", { class: `project fx-${p.fx || "none"}`, style: `--accent:${p.accent}`, "data-project": p.id }, [
+    el("article", { class: "project__article", "aria-labelledby": titleId }, [
+      el("div", { class: "project__frame" }, visual),
+      figure,
+      body,
+    ]),
   ]);
 }
 
 export function renderProjects() {
-  const featured = projects.filter((p) => p.layout === "feature");
-  const grid = projects.filter((p) => p.layout !== "feature");
-  // A Calculadora de Cramer (bloco próprio no HTML) ocupa o número logo após os destaques
-  document.querySelector('[data-projects="featured"]')
-    ?.replaceChildren(...featured.map((p, i) => renderProject(p, i + 1, i % 2 === 1)));
-  document.querySelector('[data-projects="grid"]')
-    ?.replaceChildren(...grid.map((p, i) => renderProject(p, featured.length + 2 + i, false)));
+  document.querySelector("[data-projects]")
+    ?.replaceChildren(...projects.map((p, i) => renderProject(p, i + 1)));
+
+  // Marcadores da galeria: um botão por projeto
+  document.querySelector("[data-works-dots]")?.replaceChildren(...projects.map((p, i) =>
+    el("li", {}, el("button", { type: "button", class: "works__dot", "data-go": String(i), "aria-label": `Ir para ${p.name}`, text: pad(i + 1) }))));
 
   document.querySelector("[data-in-progress]")?.replaceChildren(...inProgress.map((w) =>
     el("li", { class: "wip__item" }, [
