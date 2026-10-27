@@ -37,10 +37,8 @@
       r.classList.add("js");
       // Com WebGL provável, o planeta em CSS fica escondido enquanto o 3D carrega
       if (window.WebGLRenderingContext) r.classList.add("will-3d");
-      if (!window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-        r.classList.add("intro");
-        setTimeout(function () { r.classList.remove("intro"); }, 2500);
-      }
+      r.classList.add("intro");
+      setTimeout(function () { r.classList.remove("intro"); }, 2500);
     })();
   </script>
 

@@ -44,8 +44,6 @@ export function setupPointer({ reduceMotion }) {
     });
   }
 
-  if (reduceMotion) return;
-
   /* ---------- Inclinação dos cartões ---------- */
   document.addEventListener("pointermove", (e) => {
     if (e.pointerType !== "mouse") return;

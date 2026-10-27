@@ -341,7 +341,7 @@ export function createScene(canvas, { mobile = false, reducedMotion = false, onC
   }
 
   /* Estado vindo da página (escrito por main.js) */
-  const state = { chapter: 0, scroll: 0, px: 0, py: 0, pointerActive: false, assemble: reducedMotion ? 1 : 0, intro: reducedMotion ? 1 : 0 };
+  const state = { chapter: 0, scroll: 0, px: 0, py: 0, pointerActive: false, assemble: 0, intro: 0 };
 
   let width = 1;
   let height = 1;
@@ -414,16 +414,17 @@ export function createScene(canvas, { mobile = false, reducedMotion = false, onC
     raf = requestAnimationFrame(frame);
     if (!running) return;
     const dtRaw = Math.min(clock.getDelta(), 0.05);
-    const dt = reducedMotion ? 0 : dtRaw;
+    // Com "menos movimento" a cena segue viva, só que mais lenta
+    const dt = reducedMotion ? dtRaw * 0.45 : dtRaw;
     time += dt;
     adapt(dtRaw);
 
-    const k = reducedMotion ? 1 : 1 - Math.exp(-dtRaw * 3.2);
+    const k = 1 - Math.exp(-dtRaw * 3.2);
     cur.chapter += (state.chapter - cur.chapter) * k;
     cur.scroll += (state.scroll - cur.scroll) * k;
     cur.px += (state.px - cur.px) * k * 0.7;
     cur.py += (state.py - cur.py) * k * 0.7;
-    cur.intro += (state.intro - cur.intro) * (reducedMotion ? 1 : 1 - Math.exp(-dtRaw * 1.6));
+    cur.intro += (state.intro - cur.intro) * (1 - Math.exp(-dtRaw * 1.6));
 
     // Interpola entre os dois quadros-chave vizinhos
     const c = Math.min(Math.max(cur.chapter, 0), KEYS.length - 1);
@@ -483,7 +484,7 @@ export function createScene(canvas, { mobile = false, reducedMotion = false, onC
     // Cursor sobre o núcleo (só quando ele é esfera e está em destaque)
     let targetForce = 0;
     const sphereWeight = 1 - Math.min(1, u.uShape.value.x + u.uShape.value.y + u.uShape.value.z);
-    if (state.pointerActive && sphereWeight > 0.5 && !reducedMotion) {
+    if (state.pointerActive && sphereWeight > 0.5) {
       ndc.set(state.px, -state.py);
       camera.updateMatrixWorld();
       raycaster.setFromCamera(ndc, camera);

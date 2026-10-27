@@ -80,7 +80,7 @@ async function startScene() {
   root.classList.add("is-3d");
 
   const { state } = scene;
-  if (!reduceMotion) {
+  {
     // Entrada: as partículas se montam e a câmera se aproxima
     const t0 = performance.now();
     const ease = (t) => 1 - Math.pow(1 - t, 3);

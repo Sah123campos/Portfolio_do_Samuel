@@ -2,7 +2,7 @@
  * Coreografia da página com GSAP + ScrollTrigger (e Lenis para a rolagem suave).
  * Cada seção tem um comportamento próprio; nada prende a rolagem.
  * Só roda quando as bibliotecas carregaram. Com "menos movimento" ativo,
- * o conteúdo aparece direto e só ficam os indicadores de progresso.
+ * as animações ficam mais rápidas e a rolagem fica nativa (sem inércia).
  */
 const escapeHTML = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -54,11 +54,9 @@ export function startMotion({ gsap, ScrollTrigger, Lenis, reduceMotion }) {
     });
   }
 
-  if (reduceMotion) {
-    root.classList.remove("intro");
-    refreshLater(ScrollTrigger);
-    return { lenis };
-  }
+  /* Com "menos movimento" a coreografia continua, só que mais curta e contida
+     (sem rolagem com inércia); antes ela era desligada por completo */
+  if (reduceMotion) gsap.globalTimeline.timeScale(1.4);
 
   /* ---------- Entrada: um único momento orquestrado ---------- */
   const heroWords = document.querySelectorAll("[data-hero-word]");

@@ -52,7 +52,7 @@ As fontes (Bricolage Grotesque, IBM Plex Sans e IBM Plex Mono, licença OFL) sã
 
 - Sem WebGL (ou com economia de dados ativa): um planeta em CSS substitui a cena e todo o conteúdo continua igual.
 - Se as bibliotecas de animação não carregarem, o conteúdo aparece direto.
-- Com **menos movimento** (`prefers-reduced-motion`) não há rolagem com inércia, entradas animadas nem movimento contínuo; só os indicadores de progresso.
+- Com **menos movimento** (`prefers-reduced-motion`, por exemplo "Efeitos de animação" desligado no Windows) as animações continuam, porém mais curtas e contidas: as partículas se movem mais devagar e a rolagem fica nativa, sem inércia.
 
 ### Acessibilidade
 

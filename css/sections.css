@@ -1651,23 +1651,11 @@
 .contact-link:hover .icon { color: var(--cyan); }
 
 /* =========================================================
-   Movimento reduzido: tudo visível, sem animações contínuas
+   Movimento reduzido: as animações continuam, mais contidas.
+   Só os movimentos contínuos maiores ficam mais lentos.
    ========================================================= */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.001ms !important;
-    transition-delay: 0s !important;
-  }
-  .js .step .g-draw { stroke-dashoffset: 0; }
-  .js .step .g-node { transform: none; }
-  .js .uml__links path { stroke-dashoffset: 0; }
-  .js .uml__links .uml__dashed,
-  .js .uml__boxes g { opacity: 1; }
-  .cluster__ring { animation: none !important; }
-  .timeline__fill { transform: none; }
-  .timeline__marker::after { transform: scale(1); }
+  .cluster__ring { animation-duration: 180s !important; }
+  .fx-neon .project__visual:hover .project__fx,
+  .fx-orbit .project__visual:hover .project__fx::after { animation-duration: 6s; }
 }
