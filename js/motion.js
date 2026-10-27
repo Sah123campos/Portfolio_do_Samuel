@@ -98,16 +98,32 @@ export function startMotion({ gsap, ScrollTrigger, Lenis, reduceMotion }) {
     if (rest.length) tl.from(rest, { y: 30, autoAlpha: 0, duration: 1, stagger: 0.08, ease: "power3.out" }, 0.35);
   });
 
-  /* ---------- Projetos: a imagem se abre como uma cortina, o texto chega do lado ---------- */
+  /* ---------- Projetos: chegam na diagonal, presos à rolagem ----------
+     Cada projeto sobe de um canto inferior (alternando esquerda e direita)
+     conforme a página desce; ao voltar a rolagem, ele recua pelo mesmo caminho. */
+  const amp = reduceMotion ? 0.35 : 1; // distâncias menores com "menos movimento"
+  // dir: -1 vem da esquerda, 1 da direita; pode ser função (recalculada ao redimensionar)
+  const diagonal = (card, dir, parts) => {
+    const d = typeof dir === "function" ? dir : () => dir;
+    const tl = gsap.timeline({
+      defaults: { ease: "none" },
+      scrollTrigger: { trigger: card, start: "top 98%", end: "top 45%", scrub: 0.8, invalidateOnRefresh: true },
+    });
+    tl.fromTo(card,
+      { x: () => d() * 140 * amp, y: 160 * amp, rotate: () => d() * 2.5 * amp, autoAlpha: 0 },
+      { x: 0, y: 0, rotate: 0, autoAlpha: 1, duration: 1 }, 0);
+    if (parts?.length) {
+      tl.fromTo(parts,
+        { x: () => d() * 50 * amp, y: 40 * amp, autoAlpha: 0 },
+        { x: 0, y: 0, autoAlpha: 1, duration: 0.55, stagger: 0.05 }, 0.3);
+    }
+    return tl;
+  };
+
   document.querySelectorAll(".project").forEach((p) => {
-    const flip = p.classList.contains("is-flip");
-    const visual = p.querySelector(".project__visual");
+    const article = p.querySelector(".project__article");
     const parts = p.querySelectorAll("[data-anim]");
-    const tl = gsap.timeline({ scrollTrigger: { trigger: p, start: "top 82%", once: true } });
-    tl.fromTo(visual,
-      { clipPath: `inset(18% ${flip ? "0% 18% 36%" : "36% 18% 0%"} round 28px)`, autoAlpha: 0 },
-      { clipPath: "inset(0% 0% 0% 0% round 28px)", autoAlpha: 1, duration: 1.5, ease: "expo.out", clearProps: "clipPath" }, 0)
-      .from(parts, { x: flip ? -40 : 40, autoAlpha: 0, duration: 1, stagger: 0.06, ease: "power3.out" }, 0.25);
+    diagonal(article, () => projectDir(p), parts);
     const ghost = p.querySelector(".project__ghost");
     if (ghost) {
       gsap.fromTo(ghost, { y: 80 }, { y: -80, ease: "none", scrollTrigger: { trigger: p, start: "top bottom", end: "bottom top", scrub: true } });
@@ -120,7 +136,7 @@ export function startMotion({ gsap, ScrollTrigger, Lenis, reduceMotion }) {
   /* ---------- Cramer: o bloco se aproxima e os símbolos flutuam em camadas ---------- */
   const cramer = document.querySelector(".cramer");
   if (cramer) {
-    gsap.from(cramer, { y: 80, autoAlpha: 0, scale: 0.97, duration: 1.4, ease: "expo.out", scrollTrigger: { trigger: cramer, start: "top 85%", once: true } });
+    diagonal(cramer, 1);
     cramer.querySelectorAll(".cramer__bg span").forEach((s, i) => {
       gsap.to(s, { y: (i % 2 ? -1 : 1) * (40 + i * 18), ease: "none", scrollTrigger: { trigger: cramer, start: "top bottom", end: "bottom top", scrub: true } });
     });
@@ -206,6 +222,20 @@ export function startMotion({ gsap, ScrollTrigger, Lenis, reduceMotion }) {
   return { lenis };
 }
 
+/* De que lado o projeto chega: pela coluna em que ele está na tela.
+   Em coluna única (celular) e nos destaques, alterna esquerda/direita. */
+function projectDir(p) {
+  const list = p.parentElement;
+  const box = list.getBoundingClientRect();
+  const r = p.getBoundingClientRect();
+  if (r.width > box.width * 0.8) {
+    if (p.classList.contains("project--feature")) return p.classList.contains("is-flip") ? 1 : -1;
+    return [...list.children].indexOf(p) % 2 ? 1 : -1;
+  }
+  const off = (r.left + r.width / 2 - (box.left + box.width / 2)) / (box.width / 2);
+  return Math.abs(off) < 0.2 ? 0.35 : Math.sign(off);
+}
+
 function refreshLater(ScrollTrigger) {
   window.addEventListener("load", () => ScrollTrigger.refresh());
   document.fonts?.ready.then(() => ScrollTrigger.refresh());
@@ -226,12 +256,17 @@ function setupGalleryOrbit(gsap, ScrollTrigger) {
   let len = 0;
   let progress = 0;
   function build() {
-    const box = wrap.getBoundingClientRect();
+    // posição de layout (offset*), que ignora o deslocamento da entrada na diagonal
+    const pos = (node) => {
+      let x = 0, y = 0;
+      for (let n = node; n && n !== wrap; n = n.offsetParent) { x += n.offsetLeft; y += n.offsetTop; }
+      return { x, y };
+    };
     const pts = [...wrap.querySelectorAll(".project__visual")].map((v) => {
-      const r = v.getBoundingClientRect();
+      const o = pos(v);
       const flip = v.closest(".project").classList.contains("is-flip");
       // ponto na borda interna da imagem, voltado para o texto
-      return { x: (flip ? r.left : r.right) - box.left, y: r.top + r.height / 2 - box.top };
+      return { x: flip ? o.x : o.x + v.offsetWidth, y: o.y + v.offsetHeight / 2 };
     });
     if (pts.length < 2) return;
     let d = `M${pts[0].x} ${pts[0].y}`;

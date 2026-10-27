@@ -158,6 +158,9 @@
 /* =========================================================
    PROJETOS
    ========================================================= */
+/* Os projetos chegam na diagonal (js/motion.js); o corte evita rolagem lateral */
+.projects { overflow-x: clip; }
+
 .gallery-wrap { position: relative; }
 
 .gallery-orbit {
