@@ -213,16 +213,22 @@
         <p class="chapter-lede" data-reveal>Experiências 3D autorais, sites para clientes e ferramentas que explicam a matemática por trás do código. Cada projeto leva à demonstração e, quando o código é público, ao repositório.</p>
       </header>
 
-      <!-- Galeria diagonal: a rolagem desliza a fila de projetos na diagonal (js/motion.js) -->
+      <!-- Galeria diagonal: um projeto enorme por vez. A rolagem, o arraste lateral,
+           as setas e o teclado movem a mesma sequência na diagonal (js/motion.js) -->
       <div class="works" data-works>
-        <div class="works__stage">
-          <div class="works__ghosts" aria-hidden="true" data-works-ghosts></div>
+        <div class="works__stage" role="region" aria-roledescription="galeria" aria-label="Projetos" data-works-stage>
           <ol class="works__list" role="list" data-projects></ol>
           <div class="works__dust" aria-hidden="true" data-works-dust></div>
           <div class="works__hud">
             <p class="works__count" aria-hidden="true"><span data-works-num>01</span> / <span data-works-total>01</span></p>
             <span class="works__bar" aria-hidden="true"><span data-works-bar></span></span>
-            <ol class="works__dots" role="list" aria-label="Projetos" data-works-dots></ol>
+            <ol class="works__dots" role="list" aria-label="Ir para o projeto" data-works-dots></ol>
+            <span class="works__hint" aria-hidden="true">Arraste para o lado</span>
+            <div class="works__arrows">
+              <button class="works__arrow" type="button" data-works-prev aria-label="Projeto anterior"><svg class="icon" aria-hidden="true" style="transform:scaleX(-1)"><use href="#i-arrow"/></svg></button>
+              <button class="works__arrow" type="button" data-works-next aria-label="Próximo projeto"><svg class="icon" aria-hidden="true"><use href="#i-arrow"/></svg></button>
+            </div>
+            <p class="visually-hidden" aria-live="polite" data-works-live></p>
           </div>
         </div>
       </div>

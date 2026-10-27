@@ -456,11 +456,13 @@
 .project__note { font-size: var(--step--2); color: var(--dim); }
 
 /* ---------- Galeria diagonal ----------
-   Sem animação (ou sem JS de movimento): lista simples, imagem e texto lado a lado.
-   Com .is-diagonal (js/motion.js): o palco fica preso na tela e a fila de imagens
-   desliza na diagonal; o texto do projeto ativo aparece ao lado. */
+   Sem JS de movimento: lista simples, imagem e texto lado a lado.
+   Com .is-diagonal (js/motion.js): o palco fica preso na tela e mostra UM
+   projeto enorme por vez; rolagem, arraste lateral, setas e teclado movem a
+   sequência na diagonal. Os vizinhos esperam fora do quadro, menores e mais fundos. */
 .works__list { display: grid; gap: var(--space-2xl); }
-.works__hud { display: none; }
+.works__hud,
+.works__dust { display: none; }
 
 @media (min-width: 64em) {
   .works:not(.is-diagonal) .project__article {
@@ -471,9 +473,13 @@
 }
 
 .works.is-diagonal {
-  --card-w: min(84vw, 32rem);
+  --top: calc(var(--header-h) + 0.75rem);
+  --hud: 4.25rem;
+  --card-h: calc(100svh - var(--top) - var(--hud));
+  --card-w: calc(100vw - 2rem);
   --cx: 50%;
-  --cy: 33%;
+  --cy: calc(var(--top) + var(--card-h) / 2);
+  --pad: 1.25rem;
   /* palco ocupa a largura da tela, não só a coluna de conteúdo */
   width: 100vw;
   max-width: none;
@@ -484,28 +490,83 @@
   position: relative;
   height: 100svh;
   overflow: hidden;
+  /* o toque vertical continua rolando a página; o horizontal é o arraste */
+  touch-action: pan-y;
+  cursor: grab;
+  user-select: none;
+  -webkit-user-select: none;
 }
+.works.is-diagonal .works__stage.is-dragging { cursor: grabbing; }
+.works.is-diagonal .works__stage:focus-visible { outline: 2px solid var(--cyan); outline-offset: -6px; }
+.works.is-diagonal img { -webkit-user-drag: none; }
 
 .works.is-diagonal .works__list { display: block; height: 100%; }
+.works.is-diagonal .project,
+.works.is-diagonal .project__article { position: static; display: block; }
 
-/* Camadas de paralaxe: números gigantes ao fundo, partículas na frente */
-.works__ghosts,
-.works__dust { display: none; }
-.works.is-diagonal .works__ghosts,
-.works.is-diagonal .works__dust { display: block; position: absolute; inset: 0; pointer-events: none; }
-.works.is-diagonal .works__dust { z-index: 150; }
-.works__ghost {
+/* O painel */
+.works.is-diagonal .project__frame {
   position: absolute;
-  left: calc(var(--cx) - var(--card-w) * 0.55);
-  top: calc(var(--cy) - var(--card-w) * 0.42);
-  font-family: var(--font-display);
-  font-size: clamp(7rem, 4rem + 16vw, 22rem);
-  font-weight: 800;
-  line-height: 1;
-  color: transparent;
-  -webkit-text-stroke: 1px color-mix(in srgb, var(--accent, var(--violet)) 35%, transparent);
+  left: var(--cx);
+  top: var(--cy);
+  width: var(--card-w);
+  height: var(--card-h);
   will-change: transform, opacity;
 }
+.works.is-diagonal .project__visual {
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: clamp(18px, 2vw, 32px);
+  box-shadow: 0 60px 120px -50px rgb(0 0 0 / 0.95), 0 0 0 1px rgb(255 255 255 / 0.03) inset;
+  transform: none;
+}
+.works.is-diagonal .project__visual img { object-position: top center; }
+.works.is-diagonal .project__code { height: 100%; display: grid; align-content: center; padding-inline: 8%; }
+/* sombra só embaixo, onde fica o texto; o alto da demonstração fica limpo */
+.works.is-diagonal .project__visual::after {
+  opacity: 1;
+  background:
+    radial-gradient(40rem 20rem at calc(var(--mx) * 100%) calc(var(--my) * 100%), rgb(255 255 255 / 0.08), transparent 50%),
+    linear-gradient(180deg, transparent 38%, rgb(5 6 13 / 0.55) 62%, rgb(5 6 13 / 0.94) 100%);
+}
+.works.is-diagonal .project__cta { display: none; }
+
+/* Texto integrado ao painel, no canto inferior */
+.works.is-diagonal .project__body {
+  position: absolute;
+  z-index: 200;
+  left: calc(var(--cx) - var(--card-w) / 2 + var(--pad));
+  right: calc(100% - var(--cx) - var(--card-w) / 2 + var(--pad));
+  bottom: calc(var(--hud) + var(--pad));
+  gap: 0.55rem;
+  opacity: 0;
+  pointer-events: none;
+  cursor: auto;
+}
+.works.is-diagonal .project.is-active .project__body { pointer-events: auto; }
+.works.is-diagonal .project__name { font-size: clamp(2rem, 1.2rem + 3.6vw, 4.75rem); line-height: 0.95; text-shadow: 0 4px 30px rgb(0 0 0 / 0.5); }
+.works.is-diagonal .project__summary {
+  color: var(--star);
+  opacity: 0.86;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+/* detalhes longos ficam para leitores de tela; na tela, o painel respira */
+.works.is-diagonal .project__label,
+.works.is-diagonal .project__built,
+.works.is-diagonal .project__role {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+}
+
+/* Partículas na frente (camada mais rápida) */
+.works.is-diagonal .works__dust { display: block; position: absolute; inset: 0; z-index: 150; pointer-events: none; }
 .works__mote {
   position: absolute;
   left: 0;
@@ -515,47 +576,15 @@
   box-shadow: 0 0 10px var(--cyan);
   will-change: transform;
 }
-.works.is-diagonal .project,
-.works.is-diagonal .project__article { position: static; display: block; }
 
-.works.is-diagonal .project__frame {
-  position: absolute;
-  left: var(--cx);
-  top: var(--cy);
-  width: var(--card-w);
-  will-change: transform, opacity;
-}
-.works.is-diagonal .project__frame .project__visual { box-shadow: 0 50px 90px -40px rgb(0 0 0 / 0.95); }
-.works.is-diagonal .project:not(.is-active) .project__cta { display: none; }
-
-/* Texto do projeto ativo */
-.works.is-diagonal .project__body {
-  position: absolute;
-  z-index: 200;
-  left: var(--gutter);
-  right: var(--gutter-r);
-  bottom: max(1.25rem, 3svh);
-  opacity: 0;
-  pointer-events: none;
-}
-/* inativos ficam transparentes (não escondidos), para o teclado ainda chegar até eles */
-.works.is-diagonal .project.is-active .project__body { opacity: 1; pointer-events: auto; }
-.works.is-diagonal .project__label,
-.works.is-diagonal .project__built,
-.works.is-diagonal .project__role { display: none; }
-.works.is-diagonal .project__summary {
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-}
-
+/* Barra inferior: posição, marcadores e setas */
 .works.is-diagonal .works__hud {
   position: absolute;
   z-index: 210;
-  top: calc(var(--header-h) + 0.75rem);
-  left: var(--gutter);
-  right: var(--gutter-r);
+  left: calc(var(--cx) - var(--card-w) / 2);
+  right: calc(100% - var(--cx) - var(--card-w) / 2);
+  bottom: 0;
+  height: var(--hud);
   display: flex;
   align-items: center;
   gap: 0.9rem;
@@ -563,10 +592,11 @@
   font-size: var(--step--2);
   letter-spacing: 0.12em;
   color: var(--mist);
+  cursor: auto;
 }
 .works__count { margin: 0; white-space: nowrap; }
 .works__count [data-works-num] { color: var(--star); }
-.works__bar { position: relative; flex: 0 0 6rem; height: 1px; background: var(--line-strong); }
+.works__bar { position: relative; flex: 0 0 4rem; height: 1px; background: var(--line-strong); }
 .works__bar span {
   position: absolute;
   inset: 0;
@@ -575,33 +605,60 @@
   transform: scaleX(var(--p, 0));
 }
 .works__dots { display: none; }
+.works__hint { display: none; margin-left: auto; text-transform: uppercase; color: var(--dim); }
+.works__arrows { display: flex; gap: 0.5rem; margin-left: auto; }
+.works__hint + .works__arrows { margin-left: 0; }
+.works__arrow {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  border: 1px solid var(--line-strong);
+  color: var(--star);
+  background: rgb(9 11 24 / 0.6);
+  transition: border-color 0.3s, background 0.3s, opacity 0.3s;
+}
+.works__arrow:hover { border-color: var(--violet); background: rgb(157 140 255 / 0.14); }
+.works__arrow:disabled { opacity: 0.3; cursor: default; }
 
 @media (min-width: 48em) {
-  .works.is-diagonal { --card-w: min(60vw, 34rem); --cy: 36%; }
+  .works.is-diagonal { --pad: 2rem; --card-w: calc(100vw - 2 * var(--gutter)); }
+  .works.is-diagonal .project__body { right: auto; width: min(36rem, 55%); }
+  .works.is-diagonal .works__hint { display: inline; }
 }
 
 @media (min-width: 64em) {
-  .works.is-diagonal { --card-w: min(44vw, 44rem); --cx: 62%; --cy: 50%; }
+  /* Faixa de texto embaixo do painel: a demonstração fica livre em cima */
+  .works.is-diagonal { --band: clamp(12.5rem, 30%, 15rem); }
+  .works.is-diagonal .project__visual { background: rgb(9 11 24); }
+  .works.is-diagonal .project__visual img,
+  .works.is-diagonal .project__code { height: calc(100% - var(--band) + 3rem); }
+  .works.is-diagonal .project__visual::after {
+    background:
+      radial-gradient(40rem 20rem at calc(var(--mx) * 100%) calc(var(--my) * 100%), rgb(255 255 255 / 0.06), transparent 50%),
+      linear-gradient(180deg, transparent calc(100% - var(--band) - 0.5rem), rgb(9 11 24) calc(100% - var(--band) + 2.25rem));
+  }
   .works.is-diagonal .project__body {
-    top: 50%;
-    bottom: auto;
-    right: auto;
-    left: max(var(--gutter), calc((100vw - var(--max)) / 2));
-    width: min(30rem, 30vw);
-    transform: translateY(-50%);
+    width: auto;
+    right: calc(100% - var(--cx) - var(--card-w) / 2 + var(--pad));
+    bottom: calc(var(--hud) + var(--pad) * 0.7);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+    column-gap: var(--space-xl);
+    row-gap: 0.6rem;
+    align-items: start;
   }
-  .works.is-diagonal .project__label,
-  .works.is-diagonal .project__built,
-  .works.is-diagonal .project__role { display: revert; }
-  .works.is-diagonal .project__built { display: grid; }
-  .works.is-diagonal .project__summary { -webkit-line-clamp: unset; display: block; }
-  .works.is-diagonal .works__hud {
-    top: auto;
-    bottom: 2rem;
-    left: max(var(--gutter), calc((100vw - var(--max)) / 2));
-    right: auto;
+  .works.is-diagonal .project__meta { grid-column: 1; grid-row: 1; }
+  .works.is-diagonal .project__name { grid-column: 1; grid-row: 2 / span 3; font-size: clamp(2.25rem, 1rem + 2.6vw, 4rem); }
+  .works.is-diagonal .project__summary { grid-column: 2; grid-row: 1 / span 2; -webkit-line-clamp: 3; }
+  .works.is-diagonal .project__stack { grid-column: 2; grid-row: 3; }
+  .works.is-diagonal .project__body > div[data-anim] { grid-column: 2; grid-row: 4; }
+  .works.is-diagonal {
+    --pad: clamp(2rem, 3vw, 3.5rem);
+    /* largura limitada para o painel não ficar mais achatado que ~2:1 */
+    --card-w: min(calc(100vw - 2 * var(--gutter) - 3rem), calc(var(--card-h) * 2.05));
   }
-  .works.is-diagonal .works__dots { display: flex; gap: 0.25rem; }
+  .works.is-diagonal .works__dots { display: flex; gap: 0.15rem; }
   .works__dot {
     padding: 0.35rem 0.45rem;
     border-radius: var(--radius-s);
@@ -614,10 +671,14 @@
   .works__dot[aria-current="true"] { color: var(--star); background: rgb(157 140 255 / 0.14); }
 }
 
-/* Telas baixas: menos texto para caber ao lado da imagem */
-@media (min-width: 64em) and (max-height: 50rem) {
-  .works.is-diagonal .project__label,
-  .works.is-diagonal .project__role { display: none; }
+/* Celular em pé: a imagem fica no alto do painel e o texto embaixo, sem cobrir a demonstração */
+@media (max-width: 47.99em) {
+  .works.is-diagonal .project__visual img { height: 58%; }
+  .works.is-diagonal .project__code { height: 58%; }
+  .works.is-diagonal .project__visual::after {
+    background: linear-gradient(180deg, transparent 40%, rgb(9 11 24) 58%, rgb(9 11 24) 100%);
+  }
+  .works.is-diagonal .project__summary { -webkit-line-clamp: 4; }
 }
 
 /* ---------- Cramer ---------- */
